@@ -6,6 +6,8 @@ The first lesson is `content/occupied-root-zone.mdx`: occupied plant-available w
 
 Agents: start at [`AGENTS.md`](AGENTS.md). Design standard: [`docs/design-principles.md`](docs/design-principles.md). Domain claims: [`docs/viticulture-facts.md`](docs/viticulture-facts.md). Implementation procedure: [`docs/explorable-design.md`](docs/explorable-design.md). Schemas: [`docs/content-schema.md`](docs/content-schema.md).
 
+Live: [hittingkeys.github.io/vintner](https://hittingkeys.github.io/vintner/). Production `base` is `/vintner/`. Push to `main` deploys via `.github/workflows/pages.yml` (GitHub Actions Pages source).
+
 ## Install and run
 
 Requires Node 22+.
