@@ -1,0 +1,77 @@
+---
+id: willamette-soils
+title: Three pits, not three wine styles
+governingPart: both
+misconception: "“Soil type” is a tasting-note label, or Willamette soils differ by drainage speed. Trap: drainage ≠ water-holding ≠ rooting depth."
+coupledVariables:
+  - parent material (set by series)
+  - typical depth to restriction (set by series)
+citations:
+  - source: NRCS Official Soil Series Description, JORY
+    year: 2011
+    url: https://soilseries.sc.egov.usda.gov/OSD_Docs/J/JORY.html
+  - source: NRCS Official Soil Series Description, WILLAKENZIE
+    year: 2006
+    url: https://soilseries.sc.egov.usda.gov/OSD_Docs/W/WILLAKENZIE.html
+  - source: NRCS Official Soil Series Description, LAURELWOOD
+    year: 2006
+    url: https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LAURELWOOD.html
+  - source: NRCS Official Soil Series Description, NEKIA
+    year: 2006
+    url: https://soilseries.sc.egov.usda.gov/OSD_Docs/N/NEKIA.html
+prompts:
+  - retrievable: At 36 inches in these three typical pedons, which pit has hit a floor?
+    kind: prediction
+    answerKey: "Willakenzie. The typical pedon hits Cr at 32 in (OSD range to paralithic 20–40 in), so 36 in is in rock. Jory is still clay (floor deeper than 60 in; typical pedon still clay at 100 in). Laurelwood’s 2C starts at 52 in — a material change, not a bedrock floor (bedrock commonly more than 5 ft)."
+    sources:
+      - source: NRCS OSD WILLAKENZIE (08/2006)
+        year: 2006
+        url: https://soilseries.sc.egov.usda.gov/OSD_Docs/W/WILLAKENZIE.html
+      - source: NRCS OSD JORY (06/2011)
+        year: 2011
+        url: https://soilseries.sc.egov.usda.gov/OSD_Docs/J/JORY.html
+      - source: NRCS OSD LAURELWOOD (12/2006)
+        year: 2006
+        url: https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LAURELWOOD.html
+  - retrievable: Jory and Laurelwood are both well drained. In these described pits, what actually differs — drainage class, or what each soil formed from?
+    kind: comparison
+    answerKey: "Parent material, not drainage. Jory formed in colluvium and residuum mainly from basic igneous rock. Laurelwood formed in silty loess-like material over nonconforming clay commonly weathered from Columbia River Basalt. Both series are well drained (OSD). Jory permeability is moderately slow; Laurelwood is moderate — that is not a drainage-class difference, and it is not water-holding or rooting depth."
+    sources:
+      - source: NRCS OSD JORY (06/2011)
+        year: 2011
+        url: https://soilseries.sc.egov.usda.gov/OSD_Docs/J/JORY.html
+      - source: NRCS OSD LAURELWOOD (12/2006)
+        year: 2006
+        url: https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LAURELWOOD.html
+---
+
+<div className="lesson-prose">
+
+## Three pits, not three wine styles
+
+Jory, Willakenzie, Laurelwood — those are soil series names, not tasting notes. Each name points at one described hole: what the soil formed from, and how deep that typical pedon goes before it hits a floor.
+
+Drainage is a different property. Jory and Willakenzie are both well drained, both moderately slow permeability. They are not “fast” versus “slow.” Water-holding and rooting depth are different again; this lesson does not measure those.
+
+Drag the depth line. Each pit keeps its parent material and typical depths together. At this depth: what is here, and has this pit hit a floor?
+
+</div>
+
+<WillametteSoils />
+
+<RetrievalPrompt index={0} />
+
+<RetrievalPrompt index={1} />
+
+<div className="lesson-prose citations">
+
+## Citations of record
+
+- NRCS Official Soil Series Description, JORY (06/2011)
+- NRCS Official Soil Series Description, WILLAKENZIE (08/2006)
+- NRCS Official Soil Series Description, LAURELWOOD (12/2006)
+- NRCS Official Soil Series Description, NEKIA (07/2006)
+
+One described pit each, not every vineyard.
+
+</div>

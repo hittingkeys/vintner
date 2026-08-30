@@ -58,6 +58,29 @@ These are domain claims too. They need sources, or they do not ship:
 - prompt answers
 - tooltip copy
 
+## Willamette Valley soil series (OSD typical pedons)
+
+Citation of record: USDA NRCS Official Soil Series Descriptions. One described pit each, not every vineyard. Do not invent wine flavors, minerality, dry-farming, vine age, irrigation, PAWS, AVA personality, or Van Duzer from these names.
+
+| Series | OSD | Depth class | Drainage | Permeability | Parent material (OSD) | Restriction in typical pedon |
+| --- | --- | --- | --- | --- | --- | --- |
+| Jory | 06/2011 | very deep | well drained | moderately slow | colluvium/residuum mainly basic igneous, secondarily tuffaceous/sedimentary | floor deeper than 60 in; typical pedon still clay at 100 in (Bt3 48–100) |
+| Willakenzie | 08/2006 | moderately deep | well drained | moderately slow | loamy colluvium/residuum from sandstone, siltstone, tuffaceous materials (Spencer / Eugene) | typical Cr at 32 in; range to paralithic 20–40 in inclusive |
+| Laurelwood | 12/2006 | very deep | well drained | moderate | silty loess-like (probably middle Pleistocene) over nonconforming clay commonly weathered from Columbia River Basalt | 2C starts at 52 in (material change, not bedrock); bedrock commonly more than 5 ft |
+| Nekia | 07/2006 | moderately deep | well drained | — | same basalt family as Jory | typical R at 36 in; 20–40 in to hard bedrock. Caption only in the landing lesson. |
+
+Jory is Oregon’s state soil (2011). Vineyards are among listed uses on the Jory OSD. Vineyards are **not** listed among typical uses on the Laurelwood OSD — say that.
+
+Horizons (inches, typical pedon):
+
+- Jory: Ap 0–6 silty clay loam 5YR 3/4; A 6–16; AB 16–19; Bt1 19–29 clay 2.5YR 3/4; Bt2 29–48; Bt3 48–100 dark red clay.
+- Willakenzie: A 0–11 loam; Bt1 11–19; Bt2 19–32; Cr 32 in.
+- Laurelwood: Ap 0–11 silt loam; BA 11–23; Bt 23–52; 2C from 52 in.
+
+Trap: drainage ≠ water-holding ≠ rooting depth. Jory and Willakenzie are both well drained with moderately slow permeability.
+
+Landing-lesson axis: 0–72 in (UI scale). Jory’s typical pedon continues as clay to 100 in — do not invent a floor on this scale.
+
 ## APIs (weather, climate, soil)
 
 Probe one source at a time: schema, units, missing-data sentinels, one trimmed sample. Do not dump raw payloads into this file or into code comments.

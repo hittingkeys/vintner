@@ -1,0 +1,197 @@
+.willamette-soils {
+  --ink: #1a1a1a;
+  --muted: #5c574e;
+  --rule: #c9c1b2;
+  --paper: #fffdf8;
+  --jory: #8b3a2a;
+  --will: #8a4b2f;
+  --laurel: #6b6560;
+  color: var(--ink);
+  margin: 1.25rem 0 1.5rem;
+}
+
+.willamette-soils * {
+  box-sizing: border-box;
+}
+
+.pits-align {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: calc(16 / 720 * 100%);
+  padding-left: calc(36 / 720 * 100%);
+  padding-right: calc(12 / 720 * 100%);
+}
+
+.pit-head {
+  min-height: 4.4rem;
+}
+
+.pit-name {
+  font-weight: 650;
+  font-size: 1.05rem;
+}
+
+.pit-name[data-series="jory"] {
+  color: var(--jory);
+}
+
+.pit-name[data-series="willakenzie"] {
+  color: var(--will);
+}
+
+.pit-name[data-series="laurelwood"] {
+  color: var(--laurel);
+}
+
+.pit-formed {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.35;
+  margin: 0.15rem 0 0;
+}
+
+.pit-drain {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0.15rem 0 0;
+}
+
+.pits-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  user-select: none;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  cursor: ns-resize;
+}
+
+.pits-svg .horizon-soil {
+  stroke: #d8c7a8;
+  stroke-width: 0.5;
+}
+
+.pits-svg .horizon-paralithic {
+  fill: #6b6560;
+}
+
+.pits-svg .horizon-nonconforming {
+  fill: #9a7b5c;
+}
+
+.pits-svg .hatch {
+  stroke: #5c5348;
+  stroke-width: 1;
+}
+
+.pits-svg .cr-band {
+  fill: #6b6560;
+  opacity: 0.16;
+}
+
+.pits-svg .pit-outline {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.25;
+}
+
+.pits-svg .tick {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.pits-svg .tick-label {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.pits-svg .horizon-label {
+  fill: #3d3832;
+  font-size: 9px;
+}
+
+.pits-svg .depth-line {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.pits-svg .depth-hit {
+  stroke: transparent;
+  stroke-width: 22;
+  cursor: ns-resize;
+}
+
+.pits-svg .depth-handle {
+  fill: var(--ink);
+  cursor: ns-resize;
+}
+
+.pit-readout {
+  font-size: 0.85rem;
+  line-height: 1.35;
+  margin: 0.35rem 0 0;
+  min-height: 5.6rem;
+}
+
+.pit-readout strong {
+  font-weight: 650;
+}
+
+.pit-readout .here {
+  margin: 0 0 0.2rem;
+}
+
+.pit-readout .floor {
+  margin: 0;
+}
+
+.pit-readout .floor[data-hit="true"] {
+  color: var(--will);
+  font-weight: 650;
+}
+
+.nekia-caption {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0.7rem 0 0;
+  line-height: 1.4;
+}
+
+.uses-note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0.45rem 0 0;
+  line-height: 1.4;
+}
+
+.source-note {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0.6rem 0 0;
+  line-height: 1.4;
+}
+
+.depth-slider {
+  width: 100%;
+  margin: 0.35rem 0 0;
+}
+
+.lesson-nav {
+  font-size: 0.8rem;
+  margin: 0 0 1rem;
+}
+
+.lesson-nav a {
+  color: var(--muted);
+}
+
+@media (max-width: 720px) {
+  .pit-head {
+    min-height: 5.6rem;
+  }
+
+  .pit-readout {
+    font-size: 0.78rem;
+  }
+}

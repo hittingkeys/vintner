@@ -2,7 +2,7 @@
 
 Learner-facing viticulture explorable explanations. Client-only React + Vite + TypeScript, MDX lessons, D3 for visualization.
 
-The first lesson is `content/occupied-root-zone.mdx`: occupied plant-available water on two typical northern Willamette blocks (Jory vs Willakenzie). Spec: `src/explorables/occupied-paw/spec.ts`.
+The landing lesson is `content/willamette-soils.mdx`: three typical Willamette pedons (Jory, Willakenzie, Laurelwood) — parent material and depth to a floor. Spec: `src/explorables/willamette-soils/spec.ts`. Occupied root zone remains at `#/occupied-root-zone`.
 
 Agents: start at [`AGENTS.md`](AGENTS.md). Design standard: [`docs/design-principles.md`](docs/design-principles.md). Domain claims: [`docs/viticulture-facts.md`](docs/viticulture-facts.md). Implementation procedure: [`docs/explorable-design.md`](docs/explorable-design.md). Schemas: [`docs/content-schema.md`](docs/content-schema.md).
 
@@ -17,7 +17,7 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`). You should see **Vintner explorables** and the occupied-root-zone lesson.
+Open the URL Vite prints (usually `http://localhost:5173`). You should see **Vintner explorables** and the Willamette soils landing lesson.
 
 ## Scripts
 
