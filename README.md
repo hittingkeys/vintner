@@ -2,7 +2,7 @@
 
 Learner-facing viticulture explorable explanations. Client-only React + Vite + TypeScript, MDX lessons, D3 for visualization.
 
-There are no lessons or explorables yet. This is the scaffold: app shell, frozen content/prompt schemas, and the operating docs.
+The first lesson is `content/occupied-root-zone.mdx`: occupied plant-available water on two typical northern Willamette blocks (Jory vs Willakenzie). Spec: `src/explorables/occupied-paw/spec.ts`.
 
 Agents: start at [`AGENTS.md`](AGENTS.md). Design standard: [`docs/design-principles.md`](docs/design-principles.md). Domain claims: [`docs/viticulture-facts.md`](docs/viticulture-facts.md). Implementation procedure: [`docs/explorable-design.md`](docs/explorable-design.md). Schemas: [`docs/content-schema.md`](docs/content-schema.md).
 
@@ -15,7 +15,7 @@ npm install
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`). You should see the title **Vintner explorables** and a placeholder line. Nothing interactive yet.
+Open the URL Vite prints (usually `http://localhost:5173`). You should see **Vintner explorables** and the occupied-root-zone lesson.
 
 ## Scripts
 
@@ -29,4 +29,4 @@ Open the URL Vite prints (usually `http://localhost:5173`). You should see the t
 
 ## What this repo is not
 
-No backend, no database, no server routes. Do not invent domain numbers, citations, axis ranges, or default slider values — [`docs/viticulture-facts.md`](docs/viticulture-facts.md) governs those, and none exist yet.
+No backend, no database, no server routes. Do not invent domain numbers, citations, axis ranges, or default slider values — [`docs/viticulture-facts.md`](docs/viticulture-facts.md) governs those.
