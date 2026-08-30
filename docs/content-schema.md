@@ -2,7 +2,7 @@
 
 **Frozen.** Do not change these schemas without asking Matt. Types live in `src/schemas/`. This file is the human-readable contract.
 
-There is no lesson content yet. `content/` holds only a non-lesson stub so the MDX pipeline has a compile target.
+Lessons live in `content/` as MDX with `LessonFrontmatter`. `content/_scaffold.mdx` remains a non-lesson compile stub.
 
 ## Lesson MDX (`content/`)
 

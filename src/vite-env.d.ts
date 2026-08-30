@@ -5,6 +5,9 @@ declare module "*.mdx" {
 
   export const frontmatter: Record<string, unknown>;
 
-  const MDXComponent: ComponentType<{ children?: ReactNode }>;
+  const MDXComponent: ComponentType<{
+    children?: ReactNode;
+    components?: Record<string, ComponentType<object>>;
+  }>;
   export default MDXComponent;
 }

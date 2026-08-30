@@ -6,7 +6,7 @@ This is a Cursor / Grok Bot repo. Work from this file, not from Claude Code work
 
 Client-only React + Vite + TypeScript so explorables stay instantaneous — no round trip between a slider and the model. MDX so prose, prompts, and citations live with the lesson. D3 so data is geometry, not a chart widget.
 
-There is no backend, no database, and no server route. Educational content lives in `content/` as MDX. D3 is a declared dependency and stays unused until a later task adds a visualization.
+There is no backend, no database, and no server route. Educational content lives in `content/` as MDX. D3 draws explorable geometry (not a chart widget).
 
 ## Design standard
 

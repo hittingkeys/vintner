@@ -1,0 +1,79 @@
+---
+id: occupied-root-zone
+title: Occupied water, not a dry-farm style
+governingPart: both
+misconception: "Dry-farming is a farming style; a vine dry-farms or does not in the abstract. Related: terroir as a list of names."
+coupledVariables:
+  - profile PAWS
+  - occupied rooting depth (age, capped by Cr)
+  - typical-year weather (shared)
+  - deficit drip when Dr > RAW (p = 0.45)
+citations:
+  - source: NRCS Official Soil Series Description, JORY
+    year: 2011
+    url: https://soilseries.sc.egov.usda.gov/OSD_Docs/J/JORY.html
+  - source: NRCS Official Soil Series Description, WILLAKENZIE
+    year: 2006
+    url: https://soilseries.sc.egov.usda.gov/OSD_Docs/W/WILLAKENZIE.html
+  - source: SoilWeb SSURGO PAWS, mukeys 2711396, 85310, 62429 (Willakenzie) and or637 mukeys 62713–15 (Jory default); other Jory MUs 27, 31, 41 cm
+    year: 2011
+    url: https://casoilresource.lawr.ucdavis.edu/gmap/
+  - source: NOAA NCEI 1991–2020 normals, USW00094273 McMinnville and USW00024232 Salem
+    year: 2021
+    url: https://www.ncei.noaa.gov/products/land-based-station/us-climate-normals
+  - source: Allen, Pereira, Raes, Smith. FAO Irrigation and Drainage Paper 56, Table 22 (wine-grape Zr 1.0–2.0 m; p = 0.45)
+    year: 1998
+    url: https://www.fao.org/4/x0490e/x0490e0e.htm#depletion
+  - source: Smart, Schwass, Lakso, Morano. Grapevine rooting patterns. AJEV 57:89
+    year: 2006
+    url: https://www.ajevonline.org/content/57/1/89
+  - source: Skinkis. Grapevine Growth Through the Seasons and Years. OSU EM 8973
+    year: 2022
+    url: https://extension.oregonstate.edu/catalog/pub/em-8973-grapevine-growth-through-seasons-years-western-oregon
+  - source: USBR AgriMet monthlyet / ETtotals, ARAO and FOGO (alfalfa ETr and wine-grape ETc, labeled as such)
+    year: 2020
+    url: https://www.usbr.gov/pn/agrimet/
+  - source: Levin / OSU Extension. Southern Oregon measured wine-grape water use ~11.4 in vs AgriMet 20.2 in — contested CA Kc, not NVW
+    year: 2021
+    url: https://extension.oregonstate.edu/news/study-shows-southern-oregon-wine-grape-growers-can-save-nearly-half-their-irrigation-water
+prompts:
+  - retrievable: Same typical-year demand, established vines, no irrigation. Which block is more depleted at the end of a dry summer — Jory or Willakenzie — and what in the profile causes that difference?
+    kind: comparison
+    answerKey: "Willakenzie is more depleted. Occupied TAW is 15 cm versus 25 cm on the default Jory map unit (Jory range 25–41 cm across MUs) because a paralithic contact (Cr, typical pedon 32 in, series 20–40 in) caps the Willakenzie column; Jory is unrestricted below 60 in. Both series are well drained with moderately slow permeability (OSD). The difference is not drainage speed and not a dry-farm identity."
+    sources:
+      - source: SoilWeb SSURGO PAWS, mukeys 2711396, 85310, 62429 and or637 62713–15
+        year: 2011
+      - source: NRCS OSD JORY (06/2011) and WILLAKENZIE (08/2006)
+        year: 2011
+---
+
+<div className="lesson-prose">
+
+## Occupied water, not a dry-farm style
+
+Two blocks. Same northern Willamette weather. A typical year, not a vintage story.
+
+A vine does not dry-farm in the abstract. Plant-available water lives in the occupied root zone: profile PAWS times how deep the roots have gone, stopped by a paralithic contact if one is there. Irrigation is a response when depletion passes readily available water, not an identity.
+
+Jory and Willakenzie are both well drained, both moderately slow permeability. They are not fast versus slow. They differ in how deep the column goes and how much water that column holds. The pits hide that.
+
+</div>
+
+<RetrievalPrompt />
+
+<OccupiedPaw />
+
+<div className="lesson-prose citations">
+
+## Citations of record
+
+- NRCS OSD JORY (06/2011); NRCS OSD WILLAKENZIE (08/2006)
+- SoilWeb SSURGO PAWS, mukeys 2711396, 85310, 62429 and or637 62713–15
+- NOAA NCEI 1991–2020 normals, USW00094273 McMinnville, USW00024232 Salem
+- Allen et al. 1998 FAO-56 Table 22 (Zr, p = 0.45)
+- Smart et al. 2006 AJEV 57:89
+- OSU EM 8973 Skinkis 2022
+- AgriMet ARAO/FOGO monthlyet / ETtotals labeled as ETr / contested ETc
+- Levin / OSU Extension 2021 (southern OR 11.4 vs AgriMet 20.2 — not NVW)
+
+</div>

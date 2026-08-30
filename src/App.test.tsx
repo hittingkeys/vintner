@@ -14,4 +14,12 @@ describe("app shell", () => {
     render(<Stub />);
     expect(screen.getByText(/scaffold stub/i)).toBeInTheDocument();
   });
+
+  it("renders the occupied-root-zone lesson", () => {
+    render(<App />);
+    expect(
+      screen.getAllByText(/occupied water, not a dry-farm style/i).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByText(/willakenzie/i).length).toBeGreaterThan(0);
+  });
 });
