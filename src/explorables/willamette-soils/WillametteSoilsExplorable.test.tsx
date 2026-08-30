@@ -62,7 +62,9 @@ describe("WillametteSoilsExplorable", () => {
 
   it("keeps Nekia as a caption, not a fourth pit", () => {
     render(<WillametteSoilsExplorable />);
-    expect(screen.getByText(/nekia/i).textContent).toMatch(/not a fourth pit/i);
+    expect(document.querySelector(".nekia-caption")?.textContent).toMatch(
+      /nekia.*not a fourth pit/i,
+    );
     expect(document.querySelectorAll(".pit-head")).toHaveLength(3);
     expect(screen.queryByRole("heading", { name: /^nekia$/i })).not.toBeInTheDocument();
   });
