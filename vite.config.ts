@@ -5,7 +5,9 @@ import remarkFrontmatter from "remark-frontmatter";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig } from "vite";
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  // Project Pages URL is /vintner/. Dev stays at / so `npm run dev` is unchanged.
+  base: mode === "development" ? "/" : "/vintner/",
   plugins: [
     {
       enforce: "pre",
@@ -20,4 +22,4 @@ export default defineConfig({
     globals: true,
     setupFiles: "./src/test/setup.ts",
   },
-});
+}));
