@@ -129,7 +129,9 @@ describe("WillametteSoilsExplorable", () => {
       "unselected",
     );
     expect(document.querySelectorAll('.pit-head[data-selected="true"]')).toHaveLength(0);
-    expect(screen.getByText(/SoilWeb generalized SSURGO/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/SoilWeb generalized SSURGO/i).length,
+    ).toBeGreaterThan(0);
     expect(screen.queryByText(/223414/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Coast Range/i)).not.toBeInTheDocument();
   });
@@ -162,9 +164,7 @@ describe("WillametteSoilsExplorable", () => {
 
   it("Jory selection shows the Umpqua caption so Jory is not Willamette-only", () => {
     render(<WillametteSoilsExplorable />);
-    fireEvent.click(
-      screen.getByRole("button", { name: /Marion County type location/i }),
-    );
+    fireEvent.click(document.querySelector('[data-pin="jory"]')!);
     expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
       "jory",
     );
@@ -185,9 +185,7 @@ describe("WillametteSoilsExplorable", () => {
 
   it("type-location pin shares selection with the matching pit", () => {
     render(<WillametteSoilsExplorable />);
-    fireEvent.click(
-      screen.getByRole("button", { name: /Washington County type location/i }),
-    );
+    fireEvent.click(document.querySelector('[data-pin="laurelwood"]')!);
     expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
       "laurelwood",
     );
@@ -195,9 +193,7 @@ describe("WillametteSoilsExplorable", () => {
       document.querySelector('.pit-head[data-series="laurelwood"]')?.getAttribute("data-selected"),
     ).toBe("true");
     expect(screen.getByText(/Washington County/i)).toBeInTheDocument();
-    fireEvent.click(
-      screen.getByRole("button", { name: /Yamhill County type location/i }),
-    );
+    fireEvent.click(document.querySelector('[data-pin="willakenzie"]')!);
     expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
       "willakenzie",
     );

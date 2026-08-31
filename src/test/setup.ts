@@ -6,22 +6,24 @@ class ResizeObserverStub {
   disconnect() {}
 }
 
-if (typeof window.ResizeObserver === "undefined") {
-  window.ResizeObserver = ResizeObserverStub;
-}
+if (typeof window !== "undefined") {
+  if (typeof window.ResizeObserver === "undefined") {
+    window.ResizeObserver = ResizeObserverStub;
+  }
 
-if (typeof window.matchMedia !== "function") {
-  window.matchMedia = (query: string) =>
-    ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener() {},
-      removeListener() {},
-      addEventListener() {},
-      removeEventListener() {},
-      dispatchEvent() {
-        return false;
-      },
-    }) as MediaQueryList;
+  if (typeof window.matchMedia !== "function") {
+    window.matchMedia = (query: string) =>
+      ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener() {},
+        removeListener() {},
+        addEventListener() {},
+        removeEventListener() {},
+        dispatchEvent() {
+          return false;
+        },
+      }) as MediaQueryList;
+  }
 }

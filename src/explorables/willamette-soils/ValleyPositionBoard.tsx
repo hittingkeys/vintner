@@ -56,8 +56,8 @@ function extentStyle(seriesId: SeriesId, selected: boolean): L.PathOptions {
   };
 }
 
-function pinHtml(seriesId: SeriesId, selected: boolean, label: string): string {
-  return `<button type="button" class="type-pin-btn" data-pin="${seriesId}" data-selected="${selected ? "true" : "false"}" aria-label="${label}"></button>`;
+function pinHtml(seriesId: SeriesId, selected: boolean): string {
+  return `<span class="type-pin-btn" data-pin="${seriesId}" data-selected="${selected ? "true" : "false"}"></span>`;
 }
 
 export function ValleyPositionBoard({
@@ -96,7 +96,9 @@ export function ValleyPositionBoard({
       zoomControl: true,
       attributionControl: true,
       scrollWheelZoom: true,
-    }).fitBounds(bounds, { padding: [8, 8] });
+    })
+      .setView([44.825, -123.0], 8)
+      .fitBounds(bounds, { padding: [8, 8], maxZoom: 9 });
 
     L.tileLayer(CARTO_POSITRON, {
       attribution: CARTO_ATTRIBUTION,
@@ -124,14 +126,17 @@ export function ValleyPositionBoard({
       const marker = L.marker([lat, lon], {
         icon: L.divIcon({
           className: "type-pin",
-          html: pinHtml(pin.seriesId, false, label),
+          html: pinHtml(pin.seriesId, false),
           iconSize: [16, 16],
           iconAnchor: [8, 8],
         }),
         keyboard: true,
         title: label,
+        alt: label,
         zIndexOffset: 400,
       }).addTo(map);
+      const markerEl = marker.getElement();
+      if (markerEl) L.DomEvent.disableClickPropagation(markerEl);
       marker.on("click", (event) => {
         L.DomEvent.stopPropagation(event);
         onChoosePinRef.current(pin.seriesId);
@@ -150,11 +155,27 @@ export function ValleyPositionBoard({
       const landform = landformAtLonLat(detail.lon, detail.lat);
       if (landform) onChooseLandformRef.current(landform);
     }
+    function onDomClick(event: Event) {
+      const target = event.target as HTMLElement | null;
+      const pinEl = target?.closest?.("[data-pin]");
+      if (!pinEl) return;
+      event.stopPropagation();
+      const seriesId = pinEl.getAttribute("data-pin");
+      if (
+        seriesId === "jory" ||
+        seriesId === "willakenzie" ||
+        seriesId === "laurelwood"
+      ) {
+        onChoosePinRef.current(seriesId);
+      }
+    }
     el.addEventListener("valley-map-lonlat", onProbe);
+    el.addEventListener("click", onDomClick);
 
     mapRef.current = map;
     return () => {
       el.removeEventListener("valley-map-lonlat", onProbe);
+      el.removeEventListener("click", onDomClick);
       map.remove();
       mapRef.current = null;
       layersRef.current = {};
@@ -174,15 +195,16 @@ export function ValleyPositionBoard({
       const pinSelected =
         selectedSeries === pin.seriesId &&
         selectedLandform === landformForPin(pin.seriesId);
-      const label = `${pin.location.county} County type location — ${pin.seriesId}`;
       marker.setIcon(
         L.divIcon({
           className: "type-pin",
-          html: pinHtml(pin.seriesId, pinSelected, label),
+          html: pinHtml(pin.seriesId, pinSelected),
           iconSize: [16, 16],
           iconAnchor: [8, 8],
         }),
       );
+      const markerEl = marker.getElement();
+      if (markerEl) L.DomEvent.disableClickPropagation(markerEl);
     }
   }, [selectedLandform, selectedSeries]);
 
