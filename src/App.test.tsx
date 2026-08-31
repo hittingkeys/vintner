@@ -19,6 +19,7 @@ describe("app shell", () => {
     expect(screen.getAllByText(/^jory$/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/^laurelwood$/i).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: /occupied root zone/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /same hill/i })).toBeInTheDocument();
   });
 
   it("compiles MDX from content/", () => {
@@ -33,5 +34,17 @@ describe("app shell", () => {
       screen.getAllByText(/occupied water, not a dry-farm style/i).length,
     ).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: /willamette soils/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /same hill/i })).toBeInTheDocument();
+  });
+
+  it("serves same-hill at #/same-hill and keeps soils as the default landing", () => {
+    window.location.hash = "#/same-hill";
+    render(<App />);
+    expect(
+      screen.getAllByText(/same hill, two geometries/i).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getByTestId("facing")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /willamette soils/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /occupied root zone/i })).toBeInTheDocument();
   });
 });

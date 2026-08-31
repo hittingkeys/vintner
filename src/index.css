@@ -38,12 +38,21 @@ p {
 }
 
 .lesson-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
   font-size: 0.8rem;
   margin: 0 0 1rem;
 }
 
 .lesson-nav a {
   color: #5c574e;
+}
+
+.lesson-nav a[aria-current="page"] {
+  color: #1a1a1a;
+  font-weight: 650;
+  text-decoration: none;
 }
 
 .retrieval {

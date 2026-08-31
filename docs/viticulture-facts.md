@@ -114,6 +114,24 @@ OSD URLs:
 
 Willakenzie east/south click (south of ~44.3°N and east of ~−123.05°) is a **teaching split from OSD wording** (Eugene and Fisher vs Spencer), not a formation map.
 
+## Same hill: solar ranking vs frost pooling
+
+Schematic isolated hill, not a Willamette DEM and not GIS layers on the soils map. Solar class is ordinal. Do not invent W/m², Willamette GDD, or a cosine engine presented as data. Do not apply “25% more insolation” to opposite faces.
+
+| Claim | Number | Source |
+| --- | --- | --- |
+| SSE–SSW highest solar ranking (Oregon GIS; Umpqua, reused Rogue) | ordinal class, not a watt | Jones, Snead, Nelson, *Geoscience Canada* 31:167–178 (2004) |
+| N / NW / NE: less light/heat, delayed phenology | ordinal “less” | Jones & Duff, North Olympic Peninsula report |
+| SE / S / SW / W: more light/heat | ordinal “more”; S in the SSE–SSW sector is **highest**, not merely more | Jones & Duff, same report; Jones 2004 for the highest sector |
+| Slope &lt;1%: poor cold-air drainage | band | Jones 2004 |
+| Slope 5–15%: preferred | band | Jones 2004 |
+| 10° south vs a **flat** site: up to 25% more insolation | 25% (caption only; not south vs north) | Jones & Duff, Olympic Peninsula report |
+| No air-temperature–aspect correlation; 24 loggers / 12 northern WV vineyards | study design | Penner-Ash & Pogue 2014, GSA Abstr. 46(6):464 |
+| RLC &lt; 0.4 accounted for 81% of frost hours | 81 (caption, not 81.00) | Penner-Ash & Pogue 2014 |
+| Frost / freeze pockets via elevation and air drainage | mechanism | OSU EM 8973, Skinkis, rev. 2022 |
+
+The schematic frost contour is the Penner-Ash RLC = 0.4 threshold applied to relative height on this hill — an analog, not a 2.5 km-neighborhood RLC from a Willamette DEM.
+
 ## SoilWeb series extent (landing-lesson map)
 
 SOURCE: UC Davis SoilWeb series-extent cache, `https://casoilresource.lawr.ucdavis.edu/series-extent-cache/json/{series}.json`

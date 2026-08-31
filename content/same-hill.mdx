@@ -1,0 +1,63 @@
+---
+id: same-hill
+title: Same hill, two geometries
+governingPart: both
+misconception: "South-facing is the warm, frost-safe site. Facing ranks solar receipt; frost hours concentrate in topographic lows (air drainage), including on a south face if that face sits in a pocket."
+coupledVariables:
+  - pin position on the hill (facing + slope + relative lowness)
+  - solar class (from aspect, ordinal)
+  - frost class (from relative lowness / concavity, not aspect)
+citations:
+  - source: Jones, Snead, Nelson. Geology and Wine 8. Modeling Viticultural Landscapes. Geoscience Canada 31:167–178
+    year: 2004
+    url: https://journals.lib.unb.ca/index.php/GC/article/view/2779
+  - source: Jones, G.V. and Duff, A.A. The Climate and Landscape Potential for Wine Production in the North Olympic Peninsula Region of Washington
+    year: 2007
+    url: http://olympiccellars.com/wp-content/uploads/2014/11/grapestudypt1.pdf
+  - source: Penner-Ash, C. and Pogue, K.R. Geomorphic controls on air temperature variation in the northern Willamette Valley American Viticultural Area. GSA Abstracts with Programs 46(6):464
+    year: 2014
+    url: https://gsa.confex.com/gsa/2014AM/webprogram/Paper244618.html
+  - source: Skinkis. Establishing a vineyard in Oregon. OSU EM 8973 (rev. 2022) — elevation and air drainage to avoid frost and freeze pockets
+    year: 2022
+    url: https://extension.oregonstate.edu/catalog/em-8973-establishing-vineyard-oregon-quick-start-resource-guide
+  - source: Moyer, Kaiser, Davenport, Skinkis, Copp. Considerations and resources for vineyard establishment in the Inland Pacific Northwest. PNW 634
+    year: 2024
+    url: https://extension.oregonstate.edu/catalog/pnw-634-considerations-resources-vineyard-establishment-inland-pacific-northwest
+prompts:
+  - retrievable: Two blocks on the same hill — one on the south mid-slope, one in the trough. Which concentrates frost hours, and why?
+    kind: cause
+    answerKey: "The trough. Frost hours follow air drainage and relative lowness, not aspect. Penner-Ash & Pogue (2014): 24 loggers in 12 northern Willamette vineyards; no air-temperature–aspect correlation; sites with RLC < 0.4 accounted for 81% of frost hours. OSU EM 8973 (Skinkis, rev. 2022): elevation and air drainage to avoid frost and freeze pockets. A south mid-slope can rank highest for solar receipt (Jones SSE–SSW) and still not be the frost pocket."
+    sources:
+      - source: Penner-Ash, C. and Pogue, K.R. GSA Abstracts with Programs 46(6):464
+        year: 2014
+        url: https://gsa.confex.com/gsa/2014AM/webprogram/Paper244618.html
+      - source: Skinkis. OSU EM 8973 (rev. 2022) — elevation and air drainage to avoid frost and freeze pockets
+        year: 2022
+        url: https://extension.oregonstate.edu/catalog/em-8973-establishing-vineyard-oregon-quick-start-resource-guide
+---
+
+<div className="lesson-prose">
+
+## Same hill, two geometries
+
+One hill. Two rankings that are not the same knob.
+
+Drag the pin. The ring around the hill is solar class by facing — SSE–SSW ranks highest in Jones’s Oregon GIS (Umpqua, reused in the Rogue), not a Willamette wattmeter. The profile is frost: cold air drains downhill and fills the trough. A south face can still sit in that trough.
+
+</div>
+
+<SameHill />
+
+<RetrievalPrompt />
+
+<div className="lesson-prose citations">
+
+## Citations of record
+
+- Jones, Snead, Nelson 2004. *Geoscience Canada* 31:167–178 — SSE–SSW highest solar ranking; &lt;1% slope poor cold-air drainage; 5–15% preferred
+- Jones & Duff, North Olympic Peninsula report — N/NW/NE delayed phenology; 10° south vs a flat site, up to 25% more insolation (not south vs north)
+- Penner-Ash & Pogue 2014. GSA Abstr. 46(6):464 — 24 loggers / 12 northern WV vineyards; no air-temperature–aspect correlation; RLC &lt; 0.4 = 81% of frost hours
+- Skinkis, OSU EM 8973 (rev. 2022) — elevation and air drainage to avoid frost and freeze pockets
+- Moyer et al., PNW 634 (rev. 2024) — vineyard establishment, inland Pacific Northwest
+
+</div>
