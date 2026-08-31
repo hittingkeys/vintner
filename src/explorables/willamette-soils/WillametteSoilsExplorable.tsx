@@ -359,8 +359,9 @@ export function WillametteSoilsExplorable() {
         , <a href={OSD_LAURELWOOD.url}>LAURELWOOD {OSD_LAURELWOOD.monthYear}</a>,{" "}
         <a href={OSD_NEKIA.url}>NEKIA {OSD_NEKIA.monthYear}</a>. Willakenzie
         typical Cr {WILLAKENZIE_CR_TYPICAL_IN} in; series range to paralithic{" "}
-        {WILLAKENZIE_CR_RANGE_IN.min}–{WILLAKENZIE_CR_RANGE_IN.max} in. Map:
-        OSD geographic setting, not a soil survey. Hillside vs floor:{" "}
+        {WILLAKENZIE_CR_RANGE_IN.min}–{WILLAKENZIE_CR_RANGE_IN.max} in. Map
+        extents: SoilWeb generalized SSURGO series extent (UC Davis), not a
+        soil survey you can site from. Hillside vs floor:{" "}
         <a href={OSU_INVENTORY.url}>{OSU_INVENTORY.source}</a>.
       </p>
     </section>

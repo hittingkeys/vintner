@@ -10,10 +10,21 @@ import {
   WILLAKENZIE_WEST_ELEVATION_FT,
   WILLAKENZIE_WEST_FORMATIONS,
   dmsToDecimal,
+  landformAtLonLat,
   landformForPin,
   selectLandform,
+  typeLocationLonLat,
   typeLocationXY,
+  willakenzieLandformAt,
 } from "./geography";
+import {
+  JORY_EXTENT,
+  LAURELWOOD_EXTENT,
+  WILLAKENZIE_EXTENT,
+  extentBbox,
+  lonLatInBbox,
+  pointInSeriesExtent,
+} from "./series-extent";
 import { willametteSoilsSpec } from "./spec";
 
 describe("selectLandform (OSD geographic setting)", () => {
@@ -106,6 +117,51 @@ describe("type-location pins (OSD lat/lon, NAD27)", () => {
     expect(landformForPin("jory")).toBe("surrounding-foothills");
     expect(landformForPin("willakenzie")).toBe("western-margin-hills");
     expect(landformForPin("laurelwood")).toBe("northwest-margin-hills");
+  });
+
+  it("OSD pin decimal degrees match DMS (signed west-negative lon)", () => {
+    const jory = typeLocationLonLat(JORY_TYPE_LOCATION);
+    const will = typeLocationLonLat(WILLAKENZIE_TYPE_LOCATION);
+    const laurel = typeLocationLonLat(LAURELWOOD_TYPE_LOCATION);
+    expect(jory.lat).toBeCloseTo(44.848889, 5);
+    expect(jory.lon).toBeCloseTo(-122.997778, 5);
+    expect(will.lat).toBeCloseTo(45.333611, 5);
+    expect(will.lon).toBeCloseTo(-123.138056, 5);
+    expect(laurel.lat).toBeCloseTo(45.429444, 5);
+    expect(laurel.lon).toBeCloseTo(-123.015833, 5);
+  });
+
+  it("each pin lon/lat falls inside the corresponding vendor GeoJSON bbox", () => {
+    const jory = typeLocationLonLat(JORY_TYPE_LOCATION);
+    const will = typeLocationLonLat(WILLAKENZIE_TYPE_LOCATION);
+    const laurel = typeLocationLonLat(LAURELWOOD_TYPE_LOCATION);
+    expect(lonLatInBbox(jory.lon, jory.lat, extentBbox(JORY_EXTENT))).toBe(true);
+    expect(lonLatInBbox(will.lon, will.lat, extentBbox(WILLAKENZIE_EXTENT))).toBe(
+      true,
+    );
+    expect(
+      lonLatInBbox(laurel.lon, laurel.lat, extentBbox(LAURELWOOD_EXTENT)),
+    ).toBe(true);
+  });
+});
+
+describe("Willakenzie east/south click heuristic (OSD wording, not a formation map)", () => {
+  it("Eugene-area (−123.0, 44.05) maps to eastern-southern-margins", () => {
+    expect(willakenzieLandformAt(-123.0, 44.05)).toBe("eastern-southern-margins");
+  });
+
+  it("Carlton-area (−123.138, 45.334) maps to western-margin-hills", () => {
+    expect(willakenzieLandformAt(-123.138, 45.334)).toBe("western-margin-hills");
+    expect(landformAtLonLat(-123.138, 45.334)).toBe("western-margin-hills");
+  });
+});
+
+describe("valley floor is outside the three vendored extents", () => {
+  it("downtown Salem (−123.035, 44.942) is not inside any of the three polygons", () => {
+    expect(pointInSeriesExtent(-123.035, 44.942, JORY_EXTENT)).toBe(false);
+    expect(pointInSeriesExtent(-123.035, 44.942, WILLAKENZIE_EXTENT)).toBe(false);
+    expect(pointInSeriesExtent(-123.035, 44.942, LAURELWOOD_EXTENT)).toBe(false);
+    expect(landformAtLonLat(-123.035, 44.942)).toBe("valley-floor");
   });
 });
 

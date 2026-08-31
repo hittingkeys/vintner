@@ -81,9 +81,9 @@ Trap: drainage ≠ water-holding ≠ rooting depth. Jory and Willakenzie are bot
 
 Landing-lesson axis: 0–72 in (UI scale). Jory’s typical pedon continues as clay to 100 in — do not invent a floor on this scale.
 
-## Willamette Valley geographic setting (OSD + OSU contrast)
+## Willamette Valley geographic setting (OSD + SoilWeb extents + OSU contrast)
 
-Citation of record: the same NRCS OSDs, plus OSU (Skinkis & Skolas) for hillside vs floor. Caption any map as **OSD geographic setting, not a soil survey**. Do not draw fake soil-survey polygons or AVA blobs. Do not invent mapped acreages. City labels (Portland, Salem, Eugene) are orientation only — not soil citations. Do not label Dundee Hills, Ribbon Ridge, Eola-Amity, Yamhill-Carlton, or Laurelwood District as soil regions. Nekia stays a caption (same basalt family as Jory, shallower); do not add a Nekia region.
+Citation of record: the same NRCS OSDs, plus OSU (Skinkis & Skolas) for hillside vs floor, plus UC Davis SoilWeb series-extent cache for the colored map regions. Caption the map as **SoilWeb generalized SSURGO series extent, not a soil survey you can site from, not AVA blobs**. Pins are NRCS OSD type locations (NAD27, plotted on the WGS84 basemap, ~100 m — do not invent a NADCON shift). Do not display SoilWeb `acres` (generalized grid acres, not OSD). Do not invent wine-blog acreages. City labels come from the basemap — not soil citations. Do not label Dundee Hills, Ribbon Ridge, Eola-Amity, Yamhill-Carlton, or Laurelwood District as soil regions. Nekia stays a caption (same basalt family as Jory, shallower); do not add a Nekia region. Do not add a Woodburn polygon.
 
 | Series | OSD | Landform (OSD wording) | Elevation | Type location (NAD27) |
 | --- | --- | --- | --- | --- |
@@ -111,6 +111,24 @@ OSD URLs:
 - Jory — https://soilseries.sc.egov.usda.gov/OSD_Docs/J/JORY.html
 - Willakenzie — https://soilseries.sc.egov.usda.gov/OSD_Docs/W/WILLAKENZIE.html
 - Laurelwood — https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LAURELWOOD.html
+
+Willakenzie east/south click (south of ~44.3°N and east of ~−123.05°) is a **teaching split from OSD wording** (Eugene and Fisher vs Spencer), not a formation map.
+
+## SoilWeb series extent (landing-lesson map)
+
+SOURCE: UC Davis SoilWeb series-extent cache, `https://casoilresource.lawr.ucdavis.edu/series-extent-cache/json/{series}.json`
+AUTH: none
+SNAPSHOT: Last-Modified 2025-10-04. Vendored at build time; do not fetch SoilWeb at runtime (GitHub Pages is client-only; CORS + availability).
+
+FeatureCollection with one Feature. `Feature.properties`: series (string, uppercase), acres (number, generalized — do not display), gridsize (deg), n (cell count). geometry: MultiPolygon, coordinates [lon, lat] WGS84.
+
+Bbox (from the vendored files):
+
+- Jory ~[-123.70, 43.235, -122.335, 45.74] — continues into the Umpqua
+- Willakenzie ~[-123.662, 43.599, -122.634, 45.432]
+- Laurelwood ~[-123.283, 45.271, -122.516, 45.707] — northwest only, matches OSD
+
+GOTCHAS: generalized from SSURGO, not map-unit polygons you can site a vineyard from; gridsize differs by series (Jory 0.005, others 0.001). Caption that. Do not treat AVA names as soil maps.
 
 ## APIs (weather, climate, soil)
 

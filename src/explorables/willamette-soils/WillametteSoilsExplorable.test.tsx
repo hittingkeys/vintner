@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { WillametteSoilsExplorable } from "./WillametteSoilsExplorable";
 
 describe("WillametteSoilsExplorable", () => {
@@ -116,13 +116,12 @@ describe("WillametteSoilsExplorable", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows all landform belts when nothing is selected (extreme)", () => {
+  it("shows all three extents when nothing is selected (extreme)", () => {
     render(<WillametteSoilsExplorable />);
-    expect(document.querySelector('[data-landform="surrounding-foothills"]')).toBeTruthy();
-    expect(document.querySelector('[data-landform="western-margin-hills"]')).toBeTruthy();
-    expect(document.querySelector('[data-landform="eastern-southern-margins"]')).toBeTruthy();
-    expect(document.querySelector('[data-landform="northwest-margin-hills"]')).toBeTruthy();
-    expect(document.querySelector('[data-landform="valley-floor"]')).toBeTruthy();
+    expect(document.querySelector('[data-extent="jory"]')).toBeTruthy();
+    expect(document.querySelector('[data-extent="willakenzie"]')).toBeTruthy();
+    expect(document.querySelector('[data-extent="laurelwood"]')).toBeTruthy();
+    expect(document.querySelector("[data-valley-map]")).toBeTruthy();
     expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
       "none",
     );
@@ -130,18 +129,22 @@ describe("WillametteSoilsExplorable", () => {
       "unselected",
     );
     expect(document.querySelectorAll('.pit-head[data-selected="true"]')).toHaveLength(0);
-    expect(
-      screen.getAllByText(/OSD geographic setting, not a soil survey/i).length,
-    ).toBeGreaterThan(0);
+    expect(screen.getByText(/SoilWeb generalized SSURGO/i)).toBeInTheDocument();
+    expect(screen.queryByText(/223414/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Coast Range/i)).not.toBeInTheDocument();
   });
 
   it("floor click is a distinct state and does not highlight a pit as Jory", () => {
     render(<WillametteSoilsExplorable />);
-    fireEvent.click(
-      screen.getByRole("button", {
-        name: /valley floor — not jory, willakenzie, or laurelwood/i,
-      }),
-    );
+    const map = document.querySelector("[data-valley-map]");
+    expect(map).toBeTruthy();
+    act(() => {
+      map!.dispatchEvent(
+        new CustomEvent("valley-map-lonlat", {
+          detail: { lon: -123.035, lat: 44.942 },
+        }),
+      );
+    });
     expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
       "none",
     );
@@ -159,7 +162,9 @@ describe("WillametteSoilsExplorable", () => {
 
   it("Jory selection shows the Umpqua caption so Jory is not Willamette-only", () => {
     render(<WillametteSoilsExplorable />);
-    fireEvent.click(screen.getByRole("button", { name: /surrounding foothills — jory/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /Marion County type location/i }),
+    );
     expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
       "jory",
     );
@@ -178,7 +183,7 @@ describe("WillametteSoilsExplorable", () => {
     expect(screen.getByText(/Marion County/i)).toBeInTheDocument();
   });
 
-  it("type-location pin and belt share selection with the matching pit", () => {
+  it("type-location pin shares selection with the matching pit", () => {
     render(<WillametteSoilsExplorable />);
     fireEvent.click(
       screen.getByRole("button", { name: /Washington County type location/i }),
@@ -191,9 +196,7 @@ describe("WillametteSoilsExplorable", () => {
     ).toBe("true");
     expect(screen.getByText(/Washington County/i)).toBeInTheDocument();
     fireEvent.click(
-      screen.getByRole("button", {
-        name: /western-margin hills — willakenzie, spencer/i,
-      }),
+      screen.getByRole("button", { name: /Yamhill County type location/i }),
     );
     expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
       "willakenzie",

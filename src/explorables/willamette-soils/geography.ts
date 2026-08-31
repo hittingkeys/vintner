@@ -1,9 +1,14 @@
 import { JORY, LAURELWOOD, WILLAKENZIE, type SeriesId } from "./model";
 import { OSD_JORY, OSD_LAURELWOOD, OSD_WILLAKENZIE } from "./constants";
+import {
+  inWillametteTrough,
+  seriesContaining,
+} from "./series-extent";
 
 /**
  * OSD geographic setting + OSU hillside/floor contrast.
- * Belts are OSD wording, not soil-survey polygons. Do not invent acreages.
+ * Extents on the map are SoilWeb generalized SSURGO, not a survey
+ * you can site from, and not AVA blobs. Do not invent acreages.
  */
 
 export type LandformId =
@@ -60,7 +65,7 @@ export const WILLAKENZIE_ASSOCIATED_JORY =
 
 /** NRCS OSD JORY (06/2011): distribution includes Willamette and Umpqua. */
 export const JORY_UMPQUA_CAPTION =
-  "Jory also occurs in the Umpqua Valley (OSD geographic setting) — not Willamette-only.";
+  "Jory also occurs in the Umpqua Valley (OSD geographic setting) — not Willamette-only. The Jory layer continues south; pan to see it.";
 
 export const JORY_TYPE_LOCATION: TypeLocation = {
   county: "Marion",
@@ -115,11 +120,26 @@ export const LAURELWOOD_WHERE =
 export const LAURELWOOD_DISTRIBUTION =
   "hills along the northwest margin of the Willamette Valley, Oregon; MLRA 2; moderate extent";
 
-export const OSD_GEOGRAPHY_CAPTION =
-  "OSD geographic setting, not a soil survey.";
+export const MAP_ATTRIBUTION_CAPTION =
+  "Basemap: OpenStreetMap (CARTO Positron tiles). Attribution is on the map.";
 
-export const BELT_UNCERTAINTY =
-  "Belts follow OSD wording. They are not soil-survey polygons or AVA blobs.";
+export const EXTENT_UNCERTAINTY =
+  "Colored regions: SoilWeb generalized SSURGO series extent (UC Davis), not a soil survey you can site from, not AVA blobs. Grid size differs by series (Jory 0.005°, Willakenzie and Laurelwood 0.001°). Generalized from SSURGO — not map-unit polygons you can site a vineyard from.";
+
+export const PIN_DATUM_CAPTION =
+  "Pins: NRCS OSD type locations, NAD27, plotted on WGS84 basemap (~100 m).";
+
+export const WILLAKENZIE_SPLIT_CAPTION =
+  "Willakenzie clicks south of 44.3°N and east of −123.05° use a teaching split from OSD wording (Eugene and Fisher vs Spencer), not a formation map.";
+
+/** Teaching split from OSD wording — not a formation map. */
+export const WILLAKENZIE_EAST_SOUTH = {
+  southOfLat: 44.3,
+  eastOfLon: -123.05,
+} as const;
+
+export const OSD_GEOGRAPHY_CAPTION = MAP_ATTRIBUTION_CAPTION;
+export const BELT_UNCERTAINTY = EXTENT_UNCERTAINTY;
 
 /**
  * Schematic frame for placing OSD type-location pins on a N–S trough.
@@ -171,6 +191,48 @@ export function typeLocationXY(loc: TypeLocation): { x: number; y: number } {
     dmsToDecimal(loc.lat.deg, loc.lat.min, loc.lat.sec),
     dmsToDecimal(loc.lon.deg, loc.lon.min, loc.lon.sec),
   );
+}
+
+/** WGS84-plottable decimal degrees. Lon is signed west-negative. */
+export function typeLocationLonLat(loc: TypeLocation): {
+  lat: number;
+  lon: number;
+} {
+  return {
+    lat: dmsToDecimal(loc.lat.deg, loc.lat.min, loc.lat.sec),
+    lon: -dmsToDecimal(loc.lon.deg, loc.lon.min, loc.lon.sec),
+  };
+}
+
+/**
+ * Teaching convenience from OSD wording, not a formation map.
+ * Southern portion of the eastern valley → Eugene/Fisher; otherwise Spencer.
+ */
+export function willakenzieLandformAt(
+  lon: number,
+  lat: number,
+): "eastern-southern-margins" | "western-margin-hills" {
+  if (
+    lat < WILLAKENZIE_EAST_SOUTH.southOfLat &&
+    lon > WILLAKENZIE_EAST_SOUTH.eastOfLon
+  ) {
+    return "eastern-southern-margins";
+  }
+  return "western-margin-hills";
+}
+
+/**
+ * Map click → landform. Hit-test smallest/topmost extent first
+ * (Laurelwood, Willakenzie, Jory). Trough with no hit → valley floor.
+ */
+export function landformAtLonLat(lon: number, lat: number): LandformId | null {
+  const hits = seriesContaining(lon, lat);
+  const top = hits[0];
+  if (top === "laurelwood") return "northwest-margin-hills";
+  if (top === "willakenzie") return willakenzieLandformAt(lon, lat);
+  if (top === "jory") return "surrounding-foothills";
+  if (inWillametteTrough(lon, lat)) return "valley-floor";
+  return null;
 }
 
 export function landformForPin(
