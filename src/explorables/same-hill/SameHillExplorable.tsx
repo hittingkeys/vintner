@@ -385,7 +385,7 @@ export function SameHillExplorable() {
               in this study sat at RLC &lt; {RLC_POCKET_THRESHOLD} — Penner-Ash
               &amp; Pogue 2014, {PENNER_ASH_LOGGER_COUNT} loggers /{" "}
               {PENNER_ASH_VINEYARD_COUNT} northern Willamette vineyards. Sourced
-              caption, not a modeled {PENNER_ASH_FROST_HOURS_PCT}.00.{" "}
+              caption, not a modeled percentage.{" "}
             </>
           )}
           {site.southVsFlatInsolationCaptionPct !== null && (
