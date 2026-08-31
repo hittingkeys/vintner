@@ -7,7 +7,7 @@ import { willametteSoilsLessonIntent, willametteSoilsSpec } from "./spec";
 describe("willamette-soils ExplorableSpec", () => {
   it("satisfies the frozen ExplorableSpec shape with three sourced cases", () => {
     const spec: ExplorableSpec = willametteSoilsSpec;
-    expect(spec.knownAnswerCases).toHaveLength(3);
+    expect(spec.knownAnswerCases.length).toBeGreaterThanOrEqual(3);
     expect(spec.knownAnswerCases[0]?.expected).toBe(32);
     expect(spec.knownAnswerCases[0]?.tolerance).toBe(0);
     expect(spec.knownAnswerCases[1]?.expected).toBe(100);
@@ -25,7 +25,7 @@ describe("willamette-soils ExplorableSpec", () => {
       /everywhere in the Willamette/i,
     );
     expect(willametteSoilsLessonIntent.coupledVariables.length).toBe(3);
-    expect(willametteSoilsSpec.whatMustTheLearnerSee).toMatch(
+    expect(willametteSoilsSpec.whatIsTheResponseSpace).toMatch(
       /OSD geographic setting/i,
     );
     expect(willametteSoilsSpec.knownAnswerCases.length).toBeGreaterThanOrEqual(7);

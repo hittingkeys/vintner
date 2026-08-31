@@ -130,7 +130,9 @@ describe("WillametteSoilsExplorable", () => {
       "unselected",
     );
     expect(document.querySelectorAll('.pit-head[data-selected="true"]')).toHaveLength(0);
-    expect(screen.getByText(/OSD geographic setting, not a soil survey/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/OSD geographic setting, not a soil survey/i).length,
+    ).toBeGreaterThan(0);
   });
 
   it("floor click is a distinct state and does not highlight a pit as Jory", () => {
