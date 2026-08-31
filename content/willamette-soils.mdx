@@ -2,8 +2,9 @@
 id: willamette-soils
 title: Three pits, not three wine styles
 governingPart: both
-misconception: "“Soil type” is a tasting-note label, or Willamette soils differ by drainage speed. Trap: drainage ≠ water-holding ≠ rooting depth."
+misconception: "These series occur everywhere in the Willamette, or Dundee=Jory / Ribbon Ridge=Willakenzie as the map. Trap: do not draw fake soil-survey polygons or AVA blobs. Related: “soil type” is a tasting-note label, or Willamette soils differ by drainage speed. Drainage ≠ water-holding ≠ rooting depth."
 coupledVariables:
+  - landform belt / type-location pin (selects matching series/pit)
   - parent material (set by series)
   - typical depth to restriction (set by series)
 citations:
@@ -19,7 +20,16 @@ citations:
   - source: NRCS Official Soil Series Description, NEKIA
     year: 2006
     url: https://soilseries.sc.egov.usda.gov/OSD_Docs/N/NEKIA.html
+  - source: Skinkis & Skolas, An Inventory of Oregon's Vineyard Sites and Soils (Oregon Vineyard Soil and Nutrition Initiative), Oregon State University
+    url: https://ir.library.oregonstate.edu/downloads/q524jq16t
 prompts:
+  - retrievable: Willakenzie’s type location is Yamhill County on the west side. On which landform (floor vs western-margin hills vs surrounding foothills vs northwest-margin hills) does the OSD put Willakenzie, and which parent-material formation on that western margin?
+    kind: prediction
+    answerKey: "Western-margin hills, Spencer Formation. OSD geographic setting (08/2006): summit, shoulder, and backslope of smooth convex hills along the margins of the Willamette Valley; elevation 200 to 900 feet where these soils occur on the Spencer Formation along the western margins."
+    sources:
+      - source: NRCS OSD WILLAKENZIE (08/2006)
+        year: 2006
+        url: https://soilseries.sc.egov.usda.gov/OSD_Docs/W/WILLAKENZIE.html
   - retrievable: At 36 inches in these three typical pedons, which pit has hit a floor?
     kind: prediction
     answerKey: "Willakenzie. The typical pedon hits Cr at 32 in (OSD range to paralithic 20–40 in), so 36 in is in rock. Jory is still clay (floor deeper than 60 in; typical pedon still clay at 100 in). Laurelwood’s 2C starts at 52 in — a material change, not a bedrock floor (bedrock commonly more than 5 ft)."
@@ -49,19 +59,29 @@ prompts:
 
 ## Three pits, not three wine styles
 
-Jory, Willakenzie, Laurelwood — those are soil series names, not tasting notes. Each name points at one described hole: what the soil formed from, and how deep that typical pedon goes before it hits a floor.
+Jory, Willakenzie, Laurelwood — those are soil series names, not tasting notes. Each name points at one described hole: what the soil formed from, and how deep that typical pedon goes before it hits a floor. The same three names sit on different landforms because that is where their parent materials are. They are not sprinkled uniformly through the valley, and an AVA name is not a soil map.
 
 Drainage is a different property. Jory and Willakenzie are both well drained, both moderately slow permeability. They are not “fast” versus “slow.” Water-holding and rooting depth are different again; this lesson does not measure those.
 
-Drag the depth line. Each pit keeps its parent material and typical depths together. At this depth: what is here, and has this pit hit a floor?
+Click a belt or a type-location pin. The matching pit highlights. Drag the depth line. Each pit keeps its parent material and typical depths together. At this depth: what is here, and has this pit hit a floor?
 
 </div>
 
 <WillametteSoils />
 
+<div className="lesson-prose">
+
+## Where the names sit
+
+The map is the OSD geographic setting — not a soil survey, and not AVA blobs. Jory is described on foothills adjacent to the Willamette and Umpqua Valleys. Willakenzie is described on low hills along the valley margins (Spencer Formation along the western margins; Eugene and Fisher Formations along the eastern margins in the southern portion). Laurelwood is described on hills along the northwest margin. The valley floor is a different parent-material story: these three are hillside soils.
+
+</div>
+
 <RetrievalPrompt index={0} />
 
 <RetrievalPrompt index={1} />
+
+<RetrievalPrompt index={2} />
 
 <div className="lesson-prose citations">
 
@@ -71,7 +91,8 @@ Drag the depth line. Each pit keeps its parent material and typical depths toget
 - NRCS Official Soil Series Description, WILLAKENZIE (08/2006)
 - NRCS Official Soil Series Description, LAURELWOOD (12/2006)
 - NRCS Official Soil Series Description, NEKIA (07/2006)
+- Skinkis & Skolas, An Inventory of Oregon's Vineyard Sites and Soils (Oregon Vineyard Soil and Nutrition Initiative), Oregon State University
 
-One described pit each, not every vineyard.
+One described pit each, not every vineyard. Belts are OSD wording, not survey polygons.
 
 </div>

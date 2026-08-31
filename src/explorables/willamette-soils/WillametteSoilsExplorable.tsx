@@ -15,12 +15,20 @@ import {
   WILLAKENZIE_CR_TYPICAL_IN,
 } from "./constants";
 import {
+  OSU_INVENTORY,
+  landformForPin,
+  selectLandform,
+  type LandformId,
+  type ValleySelection,
+} from "./geography";
+import {
   PITS,
   clampDepthIn,
   readoutAt,
   type Horizon,
   type SoilSeries,
 } from "./model";
+import { ValleyPositionBoard } from "./ValleyPositionBoard";
 import "./willamette-soils.css";
 
 const PIT_FILL: Record<Horizon["kind"], string> = {
@@ -66,6 +74,18 @@ export function WillametteSoilsExplorable() {
   const sliderId = useId();
   const svgRef = useRef<SVGSVGElement>(null);
   const [depthIn, setDepthIn] = useState(DEFAULT_DEPTH_IN);
+  const [selection, setSelection] = useState<ValleySelection>("unselected");
+
+  const geo = selection === "unselected" ? null : selectLandform(selection);
+  const highlightedSeries = geo?.pitHighlighted ?? null;
+
+  function chooseLandform(id: LandformId) {
+    setSelection((prev) => (prev === id ? "unselected" : id));
+  }
+
+  function choosePin(seriesId: SoilSeries["id"]) {
+    setSelection(landformForPin(seriesId));
+  }
 
   const width = 720;
   const height = 420;
@@ -102,11 +122,38 @@ export function WillametteSoilsExplorable() {
   const readouts = PITS.map((series) => readoutAt(series, depthIn));
 
   return (
-    <section className="willamette-soils" aria-label="Three typical Willamette soil pits">
+    <section
+      className="willamette-soils"
+      aria-label="Willamette landforms and three typical soil pits"
+      data-highlighted-series={highlightedSeries ?? "none"}
+      data-geography-state={selection}
+    >
+      <ValleyPositionBoard
+        selection={selection}
+        onChooseLandform={chooseLandform}
+        onChoosePin={choosePin}
+      />
+
       <div className="pits-board">
         <div className="pits-align">
           {PITS.map((series) => (
-            <header key={series.id} className="pit-head">
+            <header
+              key={series.id}
+              className="pit-head"
+              data-series={series.id}
+              data-selected={highlightedSeries === series.id ? "true" : "false"}
+              role="button"
+              tabIndex={0}
+              aria-pressed={highlightedSeries === series.id}
+              aria-label={`${series.name} typical pedon`}
+              onClick={() => choosePin(series.id)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  choosePin(series.id);
+                }
+              }}
+            >
               <div className="pit-name" data-series={series.id}>
                 {series.name}
               </div>
@@ -203,6 +250,9 @@ export function WillametteSoilsExplorable() {
                 })}
                 <rect
                   className="pit-outline"
+                  data-selected={
+                    highlightedSeries === series.id ? "true" : "false"
+                  }
                   x={x}
                   y={y(DEPTH_MIN_IN)}
                   width={pitW}
@@ -309,7 +359,9 @@ export function WillametteSoilsExplorable() {
         , <a href={OSD_LAURELWOOD.url}>LAURELWOOD {OSD_LAURELWOOD.monthYear}</a>,{" "}
         <a href={OSD_NEKIA.url}>NEKIA {OSD_NEKIA.monthYear}</a>. Willakenzie
         typical Cr {WILLAKENZIE_CR_TYPICAL_IN} in; series range to paralithic{" "}
-        {WILLAKENZIE_CR_RANGE_IN.min}–{WILLAKENZIE_CR_RANGE_IN.max} in.
+        {WILLAKENZIE_CR_RANGE_IN.min}–{WILLAKENZIE_CR_RANGE_IN.max} in. Map:
+        OSD geographic setting, not a soil survey. Hillside vs floor:{" "}
+        <a href={OSU_INVENTORY.url}>{OSU_INVENTORY.source}</a>.
       </p>
     </section>
   );

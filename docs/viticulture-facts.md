@@ -81,6 +81,37 @@ Trap: drainage ≠ water-holding ≠ rooting depth. Jory and Willakenzie are bot
 
 Landing-lesson axis: 0–72 in (UI scale). Jory’s typical pedon continues as clay to 100 in — do not invent a floor on this scale.
 
+## Willamette Valley geographic setting (OSD + OSU contrast)
+
+Citation of record: the same NRCS OSDs, plus OSU (Skinkis & Skolas) for hillside vs floor. Caption any map as **OSD geographic setting, not a soil survey**. Do not draw fake soil-survey polygons or AVA blobs. Do not invent mapped acreages. City labels (Portland, Salem, Eugene) are orientation only — not soil citations. Do not label Dundee Hills, Ribbon Ridge, Eola-Amity, Yamhill-Carlton, or Laurelwood District as soil regions. Nekia stays a caption (same basalt family as Jory, shallower); do not add a Nekia region.
+
+| Series | OSD | Landform (OSD wording) | Elevation | Type location (NAD27) |
+| --- | --- | --- | --- | --- |
+| Jory | 06/2011 | foothills adjacent to the Willamette and Umpqua Valleys; surrounding higher hills | 250–2,500 ft | Marion County, Oregon; Turner, Oregon USGS 7.5 minute quadrangle. 44°50′56″ N, 122°59′52″ W |
+| Willakenzie (west) | 08/2006 | summit, shoulder, and backslope of smooth convex hills along the western margins (Spencer Formation) | 200–900 ft | Yamhill County, Oregon; Carlton, Oregon USGS 7.5 minute topographic quadrangle. 45°20′01″ N, 123°08′17″ W |
+| Willakenzie (east, southern portion) | 08/2006 | eastern margins in the southern portion of the valley (Eugene and Fisher Formations) | 300–1,400 ft | same series type location (Yamhill / Carlton); do not paint the entire east side Willakenzie |
+| Laurelwood | 12/2006 | hills along the northwest margin of the Willamette Valley | 200–1,600 ft | Washington County, Oregon; top of Iowa Hill; Laurelwood, Oregon USGS 7.5 minute topographic quadrangle. 45°25′46″ N, 123°00′57″ W |
+
+Distribution (OSD):
+
+- Jory — low foothills of Willamette **and** Umpqua Valleys, Oregon; MLRA 2; the series is extensive. Say the Umpqua when Jory is selected so learners do not think Jory is Willamette-only. Do not draw a second Umpqua map unless it stays tiny.
+- Willakenzie — low hills and foothills along the margins of the Willamette Valley; MLRA 2; moderate extent.
+- Laurelwood — hills along the northwest margin of the Willamette Valley, Oregon; MLRA 2; moderate extent.
+
+Willakenzie geographically associated soils (OSD WILLAKENZIE 08/2006): Jory soils are fine textured, greater than 60 inches deep to bedrock, and occur on adjacent higher hills.
+
+Valley floor contrast — OSU, Skinkis & Skolas, *An Inventory of Oregon's Vineyard Sites and Soils* (Oregon Vineyard Soil and Nutrition Initiative), https://ir.library.oregonstate.edu/downloads/q524jq16t
+
+- On stable hillsides in the Willamette: examples include Bellpine, Jory, and Willakenzie.
+- On less-stable hillsides, lower terraces, and valley floors in the Willamette: younger, less-weathered mollisols; examples Philomath, Woodburn, Yamhill.
+- Do **not** add a fourth pit for Woodburn. Floor click: these three series are hillside soils; the floor is a different parent-material story. Do not claim “too many nutrients for quality grapes.”
+
+OSD URLs:
+
+- Jory — https://soilseries.sc.egov.usda.gov/OSD_Docs/J/JORY.html
+- Willakenzie — https://soilseries.sc.egov.usda.gov/OSD_Docs/W/WILLAKENZIE.html
+- Laurelwood — https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LAURELWOOD.html
+
 ## APIs (weather, climate, soil)
 
 Probe one source at a time: schema, units, missing-data sentinels, one trimmed sample. Do not dump raw payloads into this file or into code comments.

@@ -22,8 +22,141 @@
   padding-right: calc(12 / 720 * 100%);
 }
 
+.valley-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(16rem, 0.85fr);
+  gap: 1rem;
+  align-items: start;
+  margin: 0 0 1.35rem;
+}
+
+.valley-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+}
+
+.valley-svg .flank {
+  fill: #e6e1d6;
+}
+
+.valley-svg .flank-label,
+.valley-svg .north-mark {
+  fill: var(--muted);
+  font-size: 9px;
+  text-anchor: middle;
+}
+
+.valley-svg .city {
+  fill: var(--muted);
+  font-size: 9px;
+}
+
+.valley-svg .belt {
+  cursor: pointer;
+}
+
+.valley-svg .belt-fill {
+  stroke: #3d3832;
+  stroke-width: 1;
+  opacity: 0.72;
+}
+
+.valley-svg .jory-fill {
+  fill: #c48a7a;
+}
+
+.valley-svg .will-fill {
+  fill: #c4a07a;
+}
+
+.valley-svg .laurel-fill {
+  fill: #b4aea6;
+}
+
+.valley-svg .floor-fill {
+  fill: #d5d8c8;
+}
+
+.valley-svg .belt[data-selected="true"] .belt-fill {
+  opacity: 1;
+  stroke-width: 2.25;
+}
+
+.valley-svg .belt-label {
+  fill: #3d3832;
+  font-size: 9px;
+  font-weight: 650;
+  pointer-events: none;
+}
+
+.valley-svg .belt-sub,
+.valley-svg .floor-label {
+  fill: #5c574e;
+  font-size: 8px;
+  pointer-events: none;
+}
+
+.valley-svg .type-pin {
+  cursor: pointer;
+}
+
+.valley-svg .pin-dot {
+  fill: #fffdf8;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.valley-svg .pin-core {
+  fill: var(--ink);
+}
+
+.valley-svg .type-pin[data-selected="true"] .pin-dot {
+  stroke-width: 2.25;
+}
+
+.valley-caption {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0.4rem 0 0;
+}
+
+.valley-readout {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  min-height: 12rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+}
+
+.valley-uncertainty {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0 0 0.55rem;
+}
+
+.valley-payload p {
+  color: var(--ink);
+  margin: 0 0 0.4rem;
+}
+
+.valley-payload p:last-child {
+  margin-bottom: 0;
+}
+
 .pit-head {
   min-height: 4.4rem;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.pit-head[data-selected="true"] {
+  box-shadow: inset 0 0 0 2px var(--ink);
+  padding: 0.2rem 0.35rem 0.15rem;
+  margin: -0.2rem -0.35rem 0;
 }
 
 .pit-name {
@@ -94,6 +227,10 @@
   fill: none;
   stroke: var(--ink);
   stroke-width: 1.25;
+}
+
+.pits-svg .pit-outline[data-selected="true"] {
+  stroke-width: 2.5;
 }
 
 .pits-svg .tick {
@@ -187,6 +324,10 @@
 }
 
 @media (max-width: 720px) {
+  .valley-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .pit-head {
     min-height: 5.6rem;
   }
