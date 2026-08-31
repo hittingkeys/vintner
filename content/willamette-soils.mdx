@@ -26,9 +26,16 @@ citations:
     year: 2025
     url: https://casoilresource.lawr.ucdavis.edu/series-extent-cache/json/jory.json
 prompts:
-  - retrievable: Willakenzie’s type location is Yamhill County on the west side. On which landform (floor vs western-margin hills vs surrounding foothills vs northwest-margin hills) does the OSD put Willakenzie, and which parent-material formation on that western margin?
+  - retrievable: Willakenzie’s type location is Yamhill County. On which landform (floor vs western-margin hills vs surrounding foothills vs northwest-margin hills) does the OSD put Willakenzie?
     kind: prediction
-    answerKey: "Western-margin hills, Spencer Formation. OSD geographic setting (08/2006): summit, shoulder, and backslope of smooth convex hills along the margins of the Willamette Valley; elevation 200 to 900 feet where these soils occur on the Spencer Formation along the western margins."
+    answerKey: "Western-margin hills. OSD geographic setting (08/2006): summit, shoulder, and backslope of smooth convex hills along the margins of the Willamette Valley; elevation 200 to 900 feet where these soils occur on the Spencer Formation along the western margins. Type location: Yamhill County, Oregon."
+    sources:
+      - source: NRCS OSD WILLAKENZIE (08/2006)
+        year: 2006
+        url: https://soilseries.sc.egov.usda.gov/OSD_Docs/W/WILLAKENZIE.html
+  - retrievable: At its Yamhill County type location, which parent-material formation does the OSD name for Willakenzie?
+    kind: prediction
+    answerKey: "Spencer Formation. OSD geographic setting (08/2006): elevation 200 to 900 feet where these soils occur on the Spencer Formation along the western margins of the Willamette Valley. (Eugene and Fisher Formations are named for the eastern margins in the southern portion — not the Yamhill type location.)"
     sources:
       - source: NRCS OSD WILLAKENZIE (08/2006)
         year: 2006
@@ -46,7 +53,7 @@ prompts:
       - source: NRCS OSD LAURELWOOD (12/2006)
         year: 2006
         url: https://soilseries.sc.egov.usda.gov/OSD_Docs/L/LAURELWOOD.html
-  - retrievable: Jory and Laurelwood are both well drained. In these described pits, what actually differs — drainage class, or what each soil formed from?
+  - retrievable: In these described pits, which of these two properties differs between Jory and Laurelwood — drainage class, or what each soil formed from?
     kind: comparison
     answerKey: "Parent material, not drainage. Jory formed in colluvium and residuum mainly from basic igneous rock. Laurelwood formed in silty loess-like material over nonconforming clay commonly weathered from Columbia River Basalt. Both series are well drained (OSD). Jory permeability is moderately slow; Laurelwood is moderate — that is not a drainage-class difference, and it is not water-holding or rooting depth."
     sources:
@@ -72,11 +79,15 @@ Click a colored extent or a type-location pin. The matching pit highlights. Drag
 
 <WillametteSoils />
 
+<RetrievalPrompt index={2} />
+
+<RetrievalPrompt index={3} />
+
 <div className="lesson-prose">
 
 ## Where the names sit
 
-The colored regions are SoilWeb generalized SSURGO series extents (UC Davis), not a soil survey you can site a vineyard from, and not AVA blobs. Pins are NRCS OSD type locations. Jory is described on foothills adjacent to the Willamette and Umpqua Valleys — the Jory layer continues into the Umpqua; pan south. Willakenzie is described on low hills along the valley margins (Spencer Formation along the western margins; Eugene and Fisher Formations along the eastern margins in the southern portion). Laurelwood is described on hills along the northwest margin. The valley floor is a different parent-material story: these three are hillside soils.
+The colored regions are SoilWeb generalized SSURGO series extents (UC Davis), not a soil survey you can site a vineyard from, and not AVA blobs. Pins are NRCS OSD type locations. Jory is described on foothills adjacent to the Willamette and Umpqua Valleys — the Jory layer continues into the Umpqua; pan south. Laurelwood is described on hills along the northwest margin. The valley floor is a different parent-material story: these three are hillside soils.
 
 </div>
 
@@ -84,7 +95,11 @@ The colored regions are SoilWeb generalized SSURGO series extents (UC Davis), no
 
 <RetrievalPrompt index={1} />
 
-<RetrievalPrompt index={2} />
+<div className="lesson-prose">
+
+Willakenzie is described on low hills along the valley margins (Spencer Formation along the western margins; Eugene and Fisher Formations along the eastern margins in the southern portion).
+
+</div>
 
 <div className="lesson-prose citations">
 

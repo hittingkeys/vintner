@@ -33,7 +33,7 @@ describe("willamette-soils ExplorableSpec", () => {
 });
 
 describe("willamette-soils lesson frontmatter", () => {
-  it("matches LessonFrontmatter and carries three non-definition prompts", () => {
+  it("matches LessonFrontmatter and carries four non-definition prompts", () => {
     const lesson = frontmatter as unknown as LessonFrontmatter;
     expect(lesson.id).toBe("willamette-soils");
     expect(lesson.governingPart).toBe("both");
@@ -45,15 +45,16 @@ describe("willamette-soils lesson frontmatter", () => {
         expect.stringMatching(/depth/i),
       ]),
     );
-    expect(lesson.prompts).toHaveLength(3);
+    expect(lesson.prompts).toHaveLength(4);
     expect(lesson.prompts?.[0]?.kind).toBe("prediction");
     expect(lesson.prompts?.[1]?.kind).toBe("prediction");
-    expect(lesson.prompts?.[2]?.kind).toBe("comparison");
+    expect(lesson.prompts?.[2]?.kind).toBe("prediction");
+    expect(lesson.prompts?.[3]?.kind).toBe("comparison");
     expect(lesson.prompts?.every((p) => p.kind !== "definition")).toBe(true);
     expect(lesson.prompts?.[0]?.answerKey).toMatch(/western-margin hills/i);
-    expect(lesson.prompts?.[0]?.answerKey).toMatch(/Spencer/i);
-    expect(lesson.prompts?.[1]?.answerKey).toMatch(/willakenzie/i);
-    expect(lesson.prompts?.[2]?.answerKey).toMatch(/parent material/i);
+    expect(lesson.prompts?.[1]?.answerKey).toMatch(/Spencer/i);
+    expect(lesson.prompts?.[2]?.answerKey).toMatch(/willakenzie/i);
+    expect(lesson.prompts?.[3]?.answerKey).toMatch(/parent material/i);
     expect(lesson.citations.some((c) => /OSD|Official Soil Series/i.test(c.source))).toBe(
       true,
     );

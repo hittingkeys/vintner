@@ -1,6 +1,7 @@
 import { JORY, LAURELWOOD, WILLAKENZIE, type SeriesId } from "./model";
 import { OSD_JORY, OSD_LAURELWOOD, OSD_WILLAKENZIE } from "./constants";
 import {
+  SOILWEB_SERIES_EXTENT,
   inWillametteTrough,
   seriesContaining,
 } from "./series-extent";
@@ -124,7 +125,7 @@ export const MAP_ATTRIBUTION_CAPTION =
   "Basemap: Esri World Topo. Attribution is on the map.";
 
 export const EXTENT_UNCERTAINTY =
-  "Colored regions: SoilWeb generalized SSURGO series extent (UC Davis), not a soil survey you can site from, not AVA blobs. Grid size differs by series (Jory 0.005°, Willakenzie and Laurelwood 0.001°). Generalized from SSURGO — not map-unit polygons you can site a vineyard from.";
+  `Colored regions: SoilWeb generalized SSURGO series extent (UC Davis), snapshot ${SOILWEB_SERIES_EXTENT.lastModified}, not a soil survey you can site from, not AVA blobs. Grid size differs by series (Jory 0.005°, Willakenzie and Laurelwood 0.001°). Generalized from SSURGO — not map-unit polygons you can site a vineyard from.`;
 
 export const PIN_DATUM_CAPTION =
   "Pins: NRCS OSD type locations, NAD27, plotted on WGS84 basemap (~100 m).";

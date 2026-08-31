@@ -321,9 +321,10 @@ export function WillametteSoilsExplorable() {
       <label className="visually-hidden" htmlFor={sliderId}>
         Depth in all three pits, inches
       </label>
+      {/* A4: SVG depth line is the visible control; range is AT-only. */}
       <input
         id={sliderId}
-        className="depth-slider"
+        className="visually-hidden"
         type="range"
         min={DEPTH_MIN_IN}
         max={DEPTH_MAX_IN}

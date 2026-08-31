@@ -15,7 +15,7 @@ import {
   type LandformId,
   type ValleySelection,
 } from "./geography";
-import type { SeriesId } from "./model";
+import { JORY, LAURELWOOD, WILLAKENZIE, type SeriesId } from "./model";
 import {
   SERIES_EXTENTS,
   WILLAMETTE_VIEW,
@@ -56,8 +56,15 @@ function extentStyle(seriesId: SeriesId, selected: boolean): L.PathOptions {
   };
 }
 
+const PIN_NAME: Record<SeriesId, string> = {
+  jory: JORY.name,
+  willakenzie: WILLAKENZIE.name,
+  laurelwood: LAURELWOOD.name,
+};
+
+/** F8: series name on the type-location pin, not a legend. Not a map overlay. */
 function pinHtml(seriesId: SeriesId, selected: boolean): string {
-  return `<span class="type-pin-btn" data-pin="${seriesId}" data-selected="${selected ? "true" : "false"}"></span>`;
+  return `<span class="type-pin-mark"><span class="type-pin-btn" data-pin="${seriesId}" data-selected="${selected ? "true" : "false"}"></span><span class="type-pin-name">${PIN_NAME[seriesId]}</span></span>`;
 }
 
 export function ValleyPositionBoard({
@@ -126,8 +133,8 @@ export function ValleyPositionBoard({
         icon: L.divIcon({
           className: "type-pin",
           html: pinHtml(pin.seriesId, false),
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
+          iconSize: [92, 20],
+          iconAnchor: [8, 10],
         }),
         keyboard: true,
         title: label,
@@ -198,8 +205,8 @@ export function ValleyPositionBoard({
         L.divIcon({
           className: "type-pin",
           html: pinHtml(pin.seriesId, pinSelected),
-          iconSize: [16, 16],
-          iconAnchor: [8, 8],
+          iconSize: [92, 20],
+          iconAnchor: [8, 10],
         }),
       );
       const markerEl = marker.getElement();
@@ -217,17 +224,6 @@ export function ValleyPositionBoard({
           role="application"
           aria-label="Willamette Valley map. SoilWeb generalized series extents and OSD type-location pins. Pan, zoom, or click an extent or pin."
         />
-        <ul className="extent-legend" aria-label="Series extents">
-          <li data-extent="jory">
-            <span className="swatch jory-swatch" /> Jory
-          </li>
-          <li data-extent="willakenzie">
-            <span className="swatch will-swatch" /> Willakenzie
-          </li>
-          <li data-extent="laurelwood">
-            <span className="swatch laurel-swatch" /> Laurelwood
-          </li>
-        </ul>
         <p className="valley-caption">{MAP_ATTRIBUTION_CAPTION}</p>
         <p className="valley-caption">{PIN_DATUM_CAPTION}</p>
       </div>
@@ -246,7 +242,6 @@ export function ValleyPositionBoard({
               Same three named soils sit on different landforms because that is
               where their parent materials are.
             </p>
-            <p>{PIN_DATUM_CAPTION}</p>
           </div>
         ) : geo.state === "floor" ? (
           <div className="valley-payload" data-readout="floor">

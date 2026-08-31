@@ -12,7 +12,9 @@ import {
   FIXTURES,
   RLC_POCKET_Z_M,
   evaluateSite,
+  frostPocketInnerRM,
   heightAtRadius,
+  rlcAtHeight,
   solarClassAt,
 } from "./model";
 import { sameHillSpec } from "./spec";
@@ -155,6 +157,16 @@ describe("extremes: no NaN, pocket remains visible", () => {
     expect(floor.frostClass).toBe(FROST_CLASS.pocket);
     expect(RLC_POCKET_Z_M).toBeGreaterThan(floor.zM);
     expect(RLC_POCKET_Z_M).toBeLessThan(heightAtRadius(36));
+  });
+
+  it("frost-pocket inner radius matches rlc < 0.4 through the apron", () => {
+    const inner = frostPocketInnerRM();
+    expect(inner).toBeGreaterThan(55);
+    expect(inner).toBeLessThan(66);
+    expect(rlcAtHeight(heightAtRadius(inner))).toBeLessThan(RLC_POCKET_THRESHOLD);
+    expect(evaluateSite(inner - 2, 180).frostClass).toBe(FROST_CLASS.drained);
+    expect(FIXTURES.flatApron().frostClass).toBe(FROST_CLASS.pocket);
+    expect(evaluateSite(130, 180).frostClass).toBe(FROST_CLASS.pocket);
   });
 
   it("full north and SSE–SSW pins are finite", () => {

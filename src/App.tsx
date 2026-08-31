@@ -25,14 +25,14 @@ function SoilsRetrievalPrompt({ index = 0 }: { index?: number }) {
   return <RetrievalPrompt prompt={prompt} />;
 }
 
-function OccupiedRetrievalPrompt() {
-  const prompt = occupiedLesson.prompts?.[0];
+function OccupiedRetrievalPrompt({ index = 0 }: { index?: number }) {
+  const prompt = occupiedLesson.prompts?.[index];
   if (!prompt) return null;
   return <RetrievalPrompt prompt={prompt} />;
 }
 
-function SameHillRetrievalPrompt() {
-  const prompt = sameHillLesson.prompts?.[0];
+function SameHillRetrievalPrompt({ index = 0 }: { index?: number }) {
+  const prompt = sameHillLesson.prompts?.[index];
   if (!prompt) return null;
   return <RetrievalPrompt prompt={prompt} />;
 }

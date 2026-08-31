@@ -40,7 +40,6 @@
   height: 28rem;
   min-height: 22rem;
   background: #d8d4cc;
-  border: 1px solid var(--rule);
   z-index: 0;
   font: inherit;
 }
@@ -50,41 +49,23 @@
   background: rgb(255 253 248 / 0.88);
 }
 
-.extent-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem 1rem;
-  list-style: none;
-  margin: 0.45rem 0 0;
-  padding: 0;
-  font-size: 0.8rem;
-  color: var(--ink);
-}
-
-.extent-legend .swatch {
-  display: inline-block;
-  width: 0.75rem;
-  height: 0.75rem;
-  margin-right: 0.3rem;
-  vertical-align: -0.1rem;
-  border: 1px solid #3d3832;
-}
-
-.jory-swatch {
-  background: #c48a7a;
-}
-
-.will-swatch {
-  background: #c4a07a;
-}
-
-.laurel-swatch {
-  background: #b4aea6;
-}
-
 .type-pin {
   background: none;
   border: 0;
+}
+
+.type-pin-mark {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.type-pin-name {
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--ink);
+  white-space: nowrap;
+  line-height: 1;
 }
 
 .type-pin-btn {
@@ -115,7 +96,6 @@
   min-height: 12rem;
   padding: 0.65rem 0.75rem;
   background: var(--paper);
-  border: 1px solid var(--rule);
 }
 
 .valley-uncertainty {
@@ -182,7 +162,6 @@
   touch-action: none;
   user-select: none;
   background: var(--paper);
-  border: 1px solid var(--rule);
   cursor: ns-resize;
 }
 
@@ -293,11 +272,6 @@
   color: var(--muted);
   margin: 0.6rem 0 0;
   line-height: 1.4;
-}
-
-.depth-slider {
-  width: 100%;
-  margin: 0.35rem 0 0;
 }
 
 .lesson-nav {
