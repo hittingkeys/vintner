@@ -26,7 +26,7 @@ describe("willamette-soils ExplorableSpec", () => {
     );
     expect(willametteSoilsLessonIntent.coupledVariables.length).toBe(3);
     expect(willametteSoilsSpec.whatIsTheResponseSpace).toMatch(
-      /OSD geographic setting/i,
+      /SoilWeb generalized SSURGO/i,
     );
     expect(willametteSoilsSpec.knownAnswerCases.length).toBeGreaterThanOrEqual(7);
   });
@@ -58,5 +58,6 @@ describe("willamette-soils lesson frontmatter", () => {
       true,
     );
     expect(lesson.citations.some((c) => /Skinkis/i.test(c.source))).toBe(true);
+    expect(lesson.citations.some((c) => /SoilWeb/i.test(c.source))).toBe(true);
   });
 });

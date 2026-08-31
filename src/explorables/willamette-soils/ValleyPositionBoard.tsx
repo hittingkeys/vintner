@@ -1,57 +1,63 @@
-import type { KeyboardEvent, ReactNode } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useRef } from "react";
 import {
-  BELT_UNCERTAINTY,
-  JORY_TYPE_LOCATION,
-  LAURELWOOD_TYPE_LOCATION,
-  OSD_GEOGRAPHY_CAPTION,
-  SCHEMATIC,
+  EXTENT_UNCERTAINTY,
+  MAP_ATTRIBUTION_CAPTION,
+  PIN_DATUM_CAPTION,
   TYPE_LOCATION_PINS,
-  WILLAKENZIE_TYPE_LOCATION,
+  WILLAKENZIE_SPLIT_CAPTION,
   formatDms,
+  landformAtLonLat,
+  landformForPin,
   selectLandform,
-  typeLocationXY,
+  typeLocationLonLat,
   type LandformId,
   type ValleySelection,
 } from "./geography";
+import type { SeriesId } from "./model";
+import {
+  SERIES_EXTENTS,
+  WILLAMETTE_VIEW,
+} from "./series-extent";
 
-function activate(
-  event: KeyboardEvent,
-  action: () => void,
-) {
-  if (event.key === "Enter" || event.key === " ") {
-    event.preventDefault();
-    action();
+const EXTENT_STYLE: Record<
+  SeriesId,
+  { fill: string; className: string }
+> = {
+  jory: { fill: "#c48a7a", className: "extent-jory" },
+  willakenzie: { fill: "#c4a07a", className: "extent-willakenzie" },
+  laurelwood: { fill: "#b4aea6", className: "extent-laurelwood" },
+};
+
+const CARTO_POSITRON =
+  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+
+const CARTO_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+
+function seriesForLandform(id: LandformId): SeriesId | null {
+  if (id === "surrounding-foothills") return "jory";
+  if (id === "western-margin-hills" || id === "eastern-southern-margins") {
+    return "willakenzie";
   }
+  if (id === "northwest-margin-hills") return "laurelwood";
+  return null;
 }
 
-function Belt({
-  id,
-  label,
-  selected,
-  onChoose,
-  children,
-}: {
-  id: LandformId;
-  label: string;
-  selected: boolean;
-  onChoose: (id: LandformId) => void;
-  children: ReactNode;
-}) {
-  return (
-    <g
-      className="belt"
-      data-landform={id}
-      data-selected={selected ? "true" : "false"}
-      role="button"
-      tabIndex={0}
-      aria-pressed={selected}
-      aria-label={label}
-      onClick={() => onChoose(id)}
-      onKeyDown={(event) => activate(event, () => onChoose(id))}
-    >
-      {children}
-    </g>
-  );
+function extentStyle(seriesId: SeriesId, selected: boolean): L.PathOptions {
+  return {
+    className: EXTENT_STYLE[seriesId].className,
+    color: "#3d3832",
+    weight: selected ? 2.5 : 1,
+    fillColor: EXTENT_STYLE[seriesId].fill,
+    fillOpacity: selected ? 0.72 : 0.42,
+    opacity: 1,
+  };
+}
+
+function pinHtml(seriesId: SeriesId, selected: boolean): string {
+  return `<span class="type-pin-btn" data-pin="${seriesId}" data-selected="${selected ? "true" : "false"}"></span>`;
 }
 
 export function ValleyPositionBoard({
@@ -61,202 +67,187 @@ export function ValleyPositionBoard({
 }: {
   selection: ValleySelection;
   onChooseLandform: (id: LandformId) => void;
-  onChoosePin: (seriesId: "jory" | "willakenzie" | "laurelwood") => void;
+  onChoosePin: (seriesId: SeriesId) => void;
 }) {
   const geo = selection === "unselected" ? null : selectLandform(selection);
   const selectedLandform = selection === "unselected" ? null : selection;
+  const selectedSeries = selectedLandform
+    ? seriesForLandform(selectedLandform)
+    : null;
 
-  const joryPin = typeLocationXY(JORY_TYPE_LOCATION);
-  const willPin = typeLocationXY(WILLAKENZIE_TYPE_LOCATION);
-  const laurelPin = typeLocationXY(LAURELWOOD_TYPE_LOCATION);
+  const mapEl = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const layersRef = useRef<Partial<Record<SeriesId, L.GeoJSON>>>({});
+  const pinsRef = useRef<Partial<Record<SeriesId, L.Marker>>>({});
+  const onChooseLandformRef = useRef(onChooseLandform);
+  const onChoosePinRef = useRef(onChoosePin);
+  onChooseLandformRef.current = onChooseLandform;
+  onChoosePinRef.current = onChoosePin;
+
+  useEffect(() => {
+    const el = mapEl.current;
+    if (!el) return;
+
+    const bounds = L.latLngBounds(
+      [WILLAMETTE_VIEW.south, WILLAMETTE_VIEW.west],
+      [WILLAMETTE_VIEW.north, WILLAMETTE_VIEW.east],
+    );
+    const map = L.map(el, {
+      zoomControl: true,
+      attributionControl: true,
+      scrollWheelZoom: true,
+    })
+      .setView([44.825, -123.0], 8)
+      .fitBounds(bounds, { padding: [8, 8], maxZoom: 9 });
+
+    L.tileLayer(CARTO_POSITRON, {
+      attribution: CARTO_ATTRIBUTION,
+      subdomains: "abcd",
+      maxZoom: 19,
+    }).addTo(map);
+
+    const layerOrder: SeriesId[] = ["jory", "willakenzie", "laurelwood"];
+    for (const seriesId of layerOrder) {
+      const layer = L.geoJSON(SERIES_EXTENTS[seriesId] as Parameters<typeof L.geoJSON>[0], {
+        style: () => extentStyle(seriesId, false),
+        onEachFeature: (_feature, featureLayer) => {
+          featureLayer.on("add", () => {
+            const path = (featureLayer as L.Path).getElement();
+            path?.setAttribute("data-extent", seriesId);
+          });
+        },
+      }).addTo(map);
+      layersRef.current[seriesId] = layer;
+    }
+
+    for (const pin of TYPE_LOCATION_PINS) {
+      const { lat, lon } = typeLocationLonLat(pin.location);
+      const label = `${pin.location.county} County type location — ${pin.seriesId}`;
+      const marker = L.marker([lat, lon], {
+        icon: L.divIcon({
+          className: "type-pin",
+          html: pinHtml(pin.seriesId, false),
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        }),
+        keyboard: true,
+        title: label,
+        alt: label,
+        zIndexOffset: 400,
+      }).addTo(map);
+      const markerEl = marker.getElement();
+      if (markerEl) L.DomEvent.disableClickPropagation(markerEl);
+      marker.on("click", (event) => {
+        L.DomEvent.stopPropagation(event);
+        onChoosePinRef.current(pin.seriesId);
+      });
+      pinsRef.current[pin.seriesId] = marker;
+    }
+
+    map.on("click", (event: L.LeafletMouseEvent) => {
+      const landform = landformAtLonLat(event.latlng.lng, event.latlng.lat);
+      if (landform) onChooseLandformRef.current(landform);
+    });
+
+    function onProbe(event: Event) {
+      const detail = (event as CustomEvent<{ lon: number; lat: number }>).detail;
+      if (detail == null) return;
+      const landform = landformAtLonLat(detail.lon, detail.lat);
+      if (landform) onChooseLandformRef.current(landform);
+    }
+    function onDomClick(event: Event) {
+      const target = event.target as HTMLElement | null;
+      const pinEl = target?.closest?.("[data-pin]");
+      if (!pinEl) return;
+      event.stopPropagation();
+      const seriesId = pinEl.getAttribute("data-pin");
+      if (
+        seriesId === "jory" ||
+        seriesId === "willakenzie" ||
+        seriesId === "laurelwood"
+      ) {
+        onChoosePinRef.current(seriesId);
+      }
+    }
+    el.addEventListener("valley-map-lonlat", onProbe);
+    el.addEventListener("click", onDomClick);
+
+    mapRef.current = map;
+    return () => {
+      el.removeEventListener("valley-map-lonlat", onProbe);
+      el.removeEventListener("click", onDomClick);
+      map.remove();
+      mapRef.current = null;
+      layersRef.current = {};
+      pinsRef.current = {};
+    };
+  }, []);
+
+  useEffect(() => {
+    for (const seriesId of ["jory", "willakenzie", "laurelwood"] as const) {
+      layersRef.current[seriesId]?.setStyle(
+        extentStyle(seriesId, selectedSeries === seriesId),
+      );
+    }
+    for (const pin of TYPE_LOCATION_PINS) {
+      const marker = pinsRef.current[pin.seriesId];
+      if (!marker) continue;
+      const pinSelected =
+        selectedSeries === pin.seriesId &&
+        selectedLandform === landformForPin(pin.seriesId);
+      marker.setIcon(
+        L.divIcon({
+          className: "type-pin",
+          html: pinHtml(pin.seriesId, pinSelected),
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
+        }),
+      );
+      const markerEl = marker.getElement();
+      if (markerEl) L.DomEvent.disableClickPropagation(markerEl);
+    }
+  }, [selectedLandform, selectedSeries]);
 
   return (
     <div className="valley-board" data-geography-state={selection}>
       <div className="valley-map-wrap">
-        <svg
-          className="valley-svg"
-          viewBox={`0 0 ${SCHEMATIC.width} ${SCHEMATIC.height}`}
-          role="img"
-          aria-label="Willamette Valley landform schematic. OSD geographic setting, not a soil survey. Click a belt or type-location pin."
-        >
-          <text className="north-mark" x={150} y={14}>
-            N
-          </text>
-          <text className="north-mark" x={150} y={434}>
-            S
-          </text>
-
-          <rect className="flank" x={6} y={20} width={30} height={400} />
-          <text className="flank-label" transform="translate(21,220) rotate(-90)">
-            Coast Range
-          </text>
-          <rect className="flank" x={264} y={20} width={30} height={400} />
-          <text className="flank-label" transform="translate(279,220) rotate(-90)">
-            Cascades
-          </text>
-
-          <Belt
-            id="surrounding-foothills"
-            label="Surrounding foothills — Jory"
-            selected={selectedLandform === "surrounding-foothills"}
-            onChoose={onChooseLandform}
-          >
-            <path
-              className="belt-fill jory-fill"
-              d="M38,148 C36,220 38,300 44,378 C48,400 78,410 118,404 L118,376 C80,380 70,300 72,200 L72,150 C62,140 46,138 38,148 Z"
-            />
-            <path
-              className="belt-fill jory-fill"
-              d="M148,48 C188,32 232,44 238,88 C244,150 246,250 242,348 C238,386 208,412 168,410 L156,300 L148,200 L158,78 C154,58 150,50 148,48 Z"
-            />
-            <text className="belt-label" x={50} y={268}>
-              Jory
-            </text>
-            <text className="belt-label" x={200} y={168}>
-              Jory
-            </text>
-          </Belt>
-
-          <Belt
-            id="northwest-margin-hills"
-            label="Northwest-margin hills — Laurelwood"
-            selected={selectedLandform === "northwest-margin-hills"}
-            onChoose={onChooseLandform}
-          >
-            <ellipse
-              className="belt-fill laurel-fill"
-              cx={118}
-              cy={62}
-              rx={54}
-              ry={34}
-            />
-            <text className="belt-label" x={90} y={66}>
-              Laurelwood
-            </text>
-          </Belt>
-
-          <Belt
-            id="western-margin-hills"
-            label="Western-margin hills — Willakenzie, Spencer Formation"
-            selected={selectedLandform === "western-margin-hills"}
-            onChoose={onChooseLandform}
-          >
-            <ellipse
-              className="belt-fill will-fill"
-              cx={90}
-              cy={112}
-              rx={46}
-              ry={38}
-            />
-            <text className="belt-label" x={62} y={108}>
-              Willakenzie
-            </text>
-            <text className="belt-sub" x={68} y={122}>
-              Spencer
-            </text>
-          </Belt>
-
-          <Belt
-            id="eastern-southern-margins"
-            label="Eastern margins, southern portion — Willakenzie, Eugene and Fisher Formations"
-            selected={selectedLandform === "eastern-southern-margins"}
-            onChoose={onChooseLandform}
-          >
-            <ellipse
-              className="belt-fill will-fill"
-              cx={210}
-              cy={348}
-              rx={32}
-              ry={22}
-            />
-            <text className="belt-label" x={186} y={346}>
-              Willakenzie
-            </text>
-            <text className="belt-sub" x={188} y={358}>
-              Eugene / Fisher
-            </text>
-          </Belt>
-
-          <Belt
-            id="valley-floor"
-            label="Valley floor — not Jory, Willakenzie, or Laurelwood"
-            selected={selectedLandform === "valley-floor"}
-            onChoose={onChooseLandform}
-          >
-            <path
-              className="belt-fill floor-fill"
-              d="M172,28 L206,28 L148,200 L156,300 L164,412 L124,412 L116,300 L106,200 L148,85 Z"
-            />
-            <text className="belt-label floor-label" x={128} y={300}>
-              floor
-            </text>
-          </Belt>
-
-          <text className="city" x={184} y={44}>
-            Portland
-          </text>
-          <text className="city" x={112} y={248}>
-            Salem
-          </text>
-          <text className="city" x={128} y={400}>
-            Eugene
-          </text>
-
-          {TYPE_LOCATION_PINS.map((pin) => {
-            const { x, y } =
-              pin.seriesId === "jory"
-                ? joryPin
-                : pin.seriesId === "willakenzie"
-                  ? willPin
-                  : laurelPin;
-            const pinSelected =
-              geo?.seriesId === pin.seriesId &&
-              selectedLandform ===
-                (pin.seriesId === "jory"
-                  ? "surrounding-foothills"
-                  : pin.seriesId === "willakenzie"
-                    ? "western-margin-hills"
-                    : "northwest-margin-hills");
-            return (
-              <g
-                key={pin.seriesId}
-                className="type-pin"
-                data-pin={pin.seriesId}
-                data-selected={pinSelected ? "true" : "false"}
-                role="button"
-                tabIndex={0}
-                aria-label={`${pin.location.county} County type location — ${pin.seriesId}`}
-                transform={`translate(${x},${y})`}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onChoosePin(pin.seriesId);
-                }}
-                onKeyDown={(event) =>
-                  activate(event, () => onChoosePin(pin.seriesId))
-                }
-              >
-                <circle className="pin-dot" r={6} />
-                <circle className="pin-core" r={2.5} />
-              </g>
-            );
-          })}
-        </svg>
-        <p className="valley-caption">{OSD_GEOGRAPHY_CAPTION}</p>
+        <div
+          ref={mapEl}
+          className="valley-map"
+          data-valley-map="true"
+          role="application"
+          aria-label="Willamette Valley map. SoilWeb generalized series extents and OSD type-location pins. Pan, zoom, or click an extent or pin."
+        />
+        <ul className="extent-legend" aria-label="Series extents">
+          <li data-extent="jory">
+            <span className="swatch jory-swatch" /> Jory
+          </li>
+          <li data-extent="willakenzie">
+            <span className="swatch will-swatch" /> Willakenzie
+          </li>
+          <li data-extent="laurelwood">
+            <span className="swatch laurel-swatch" /> Laurelwood
+          </li>
+        </ul>
+        <p className="valley-caption">{MAP_ATTRIBUTION_CAPTION}</p>
+        <p className="valley-caption">{PIN_DATUM_CAPTION}</p>
       </div>
 
       <aside className="valley-readout" aria-live="polite">
-        <p className="valley-uncertainty">{BELT_UNCERTAINTY}</p>
+        <p className="valley-uncertainty">{EXTENT_UNCERTAINTY}</p>
+        <p className="valley-uncertainty">{WILLAKENZIE_SPLIT_CAPTION}</p>
         {geo == null ? (
           <div className="valley-payload" data-readout="unselected">
             <p>
-              <strong>Where:</strong> click a landform belt or a type-location
-              pin. All three belts stay visible.
+              <strong>Where:</strong> click a colored extent or a type-location
+              pin. All three extents stay visible. Click the Willamette trough
+              where none of the three hit for the valley floor.
             </p>
             <p>
               Same three named soils sit on different landforms because that is
               where their parent materials are.
             </p>
-            <p>Pins are the only point-accurate features (OSD lat/lon, NAD27).</p>
+            <p>{PIN_DATUM_CAPTION}</p>
           </div>
         ) : geo.state === "floor" ? (
           <div className="valley-payload" data-readout="floor">
