@@ -8,8 +8,6 @@
   --more: #d4a574;
   --less: #7a8aa0;
   --pool: #3d5c78;
-  --hill: #c4a574;
-  --trough: #8aa0b4;
   color: var(--ink);
   margin: 1.5rem 0 2rem;
 }
@@ -21,52 +19,39 @@
 .same-hill-board {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 0.75rem 1.25rem;
+  gap: 0.5rem 0.85rem;
   background: var(--board);
   border: 1px solid var(--rule);
-  padding: 0.75rem;
+  padding: 0.5rem 0.6rem 0.65rem;
 }
 
 .same-hill-state {
   grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.5rem 0.75rem;
-  font-size: 0.85rem;
-  line-height: 1.3;
-}
-
-.same-hill-state dt {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1.1rem;
   margin: 0;
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
   color: var(--muted);
+  line-height: 1.35;
 }
 
-.same-hill-state dd {
-  margin: 0.1rem 0 0;
+.same-hill-state strong {
+  color: var(--ink);
   font-weight: 650;
 }
 
-.same-hill-state [data-frost="pocket"] dd {
+.same-hill-state[data-frost="pocket"] [data-testid="frost-class"] {
   color: var(--pool);
 }
 
-.same-hill-state [data-solar="highest"] dd {
+.same-hill-state[data-solar="highest"] [data-testid="solar-class"] {
   color: var(--highest);
 }
 
 .same-hill-plan,
 .same-hill-profile {
   min-width: 0;
-}
-
-.same-hill-plan h3,
-.same-hill-profile h3 {
-  font-size: 0.85rem;
-  font-weight: 650;
-  margin: 0 0 0.25rem;
 }
 
 .same-hill svg {
@@ -82,7 +67,7 @@
 }
 
 .same-hill .trough-fill {
-  fill: var(--trough);
+  fill: #8aa0b4;
   opacity: 0.45;
 }
 
@@ -90,26 +75,27 @@
   fill: none;
   stroke: #8b6a44;
   stroke-width: 1;
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .same-hill .sun-wedge-highest {
   fill: var(--highest);
-  opacity: 0.55;
+  opacity: 0.5;
 }
 
 .same-hill .sun-wedge-more {
   fill: var(--more);
-  opacity: 0.4;
+  opacity: 0.38;
 }
 
 .same-hill .sun-wedge-less {
   fill: var(--less);
-  opacity: 0.45;
+  opacity: 0.42;
 }
 
-.same-hill .ring-marker {
-  fill: var(--ink);
+.same-hill .ring-tick {
+  stroke: var(--ink);
+  stroke-width: 2;
 }
 
 .same-hill .pin {
@@ -143,6 +129,29 @@
   font-weight: 650;
 }
 
+.same-hill .ring-label {
+  fill: var(--ink);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.same-hill .label-pool {
+  fill: var(--pool);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.same-hill .pin-label {
+  fill: var(--ink);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.same-hill .source-on-graphic {
+  fill: var(--muted);
+  font-size: 9px;
+}
+
 .same-hill .pool {
   fill: var(--pool);
   opacity: 0.45;
@@ -161,64 +170,8 @@
   fill: none;
 }
 
-.same-hill .axis {
-  stroke: var(--rule);
-  stroke-width: 1;
-}
-
-.same-hill-captions {
-  grid-column: 1 / -1;
-  font-size: 0.78rem;
-  color: var(--muted);
-  line-height: 1.45;
-  margin: 0;
-}
-
-.same-hill-captions strong {
-  color: var(--ink);
-  font-weight: 650;
-}
-
-.same-hill-legend {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.1rem;
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin: 0;
-}
-
-.same-hill-legend i {
-  display: inline-block;
-  width: 0.85rem;
-  height: 0.55rem;
-  margin-right: 0.3rem;
-  vertical-align: middle;
-}
-
-.same-hill-legend .highest i {
-  background: var(--highest);
-}
-
-.same-hill-legend .more i {
-  background: var(--more);
-}
-
-.same-hill-legend .less i {
-  background: var(--less);
-}
-
-.same-hill-legend .pool i {
-  background: var(--pool);
-}
-
 @media (max-width: 720px) {
   .same-hill-board {
     grid-template-columns: 1fr;
-  }
-
-  .same-hill-state {
-    grid-template-columns: 1fr 1fr;
   }
 }

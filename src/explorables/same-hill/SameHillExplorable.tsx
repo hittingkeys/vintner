@@ -10,19 +10,29 @@ import {
   PENNER_ASH_LOGGER_COUNT,
   PENNER_ASH_VINEYARD_COUNT,
   RLC_POCKET_THRESHOLD,
+  SOLAR_HIGHEST_BEARING,
 } from "./constants";
 import {
   RLC_POCKET_Z_M,
   evaluateSite,
   profileHeights,
-  solarClassAt,
+  wrapBearingDeg,
   xyToPolar,
   type SiteState,
 } from "./model";
 import "./same-hill.css";
 
-const PLAN = { size: 480, cx: 240, cy: 240, hillPx: 152, ringInner: 168, ringOuter: 198 };
-const PROFILE = { w: 480, h: 220, m: { top: 18, right: 16, bottom: 36, left: 36 } };
+const PLAN = {
+  w: 480,
+  h: 560,
+  cx: 240,
+  cy: 248,
+  hillPx: 138,
+  ringInner: 154,
+  ringOuter: 186,
+};
+const PROFILE = { w: 480, h: 280, m: { top: 28, right: 14, bottom: 72, left: 44 } };
+const PIN_R = 7;
 
 function svgPoint(svg: SVGSVGElement, event: PointerEvent): { x: number; y: number } {
   const pt = svg.createSVGPoint();
@@ -34,10 +44,35 @@ function svgPoint(svg: SVGSVGElement, event: PointerEvent): { x: number; y: numb
   return { x: local.x, y: local.y };
 }
 
-function solarWedgeClass(code: ReturnType<typeof solarClassAt>["code"]): string {
-  if (code === 2) return "sun-wedge-highest";
-  if (code === 1) return "sun-wedge-more";
-  return "sun-wedge-less";
+/** Compass bearing 0 = north, clockwise → SVG coords (y down). */
+function polar(cx: number, cy: number, r: number, bearingDeg: number): { x: number; y: number } {
+  const a = ((bearingDeg - 90) * Math.PI) / 180;
+  return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) };
+}
+
+/** Equal-width annulus sector. Thickness does not encode class (F1). */
+function annulusSector(
+  cx: number,
+  cy: number,
+  r0: number,
+  r1: number,
+  fromDeg: number,
+  toDeg: number,
+): string {
+  let span = wrapBearingDeg(toDeg - fromDeg);
+  if (span === 0) span = 360;
+  const large = span > 180 ? 1 : 0;
+  const p0o = polar(cx, cy, r1, fromDeg);
+  const p1o = polar(cx, cy, r1, toDeg);
+  const p1i = polar(cx, cy, r0, toDeg);
+  const p0i = polar(cx, cy, r0, fromDeg);
+  return [
+    `M ${p0o.x} ${p0o.y}`,
+    `A ${r1} ${r1} 0 ${large} 1 ${p1o.x} ${p1o.y}`,
+    `L ${p1i.x} ${p1i.y}`,
+    `A ${r0} ${r0} 0 ${large} 0 ${p0i.x} ${p0i.y}`,
+    "Z",
+  ].join(" ");
 }
 
 function PlanHill({
@@ -51,43 +86,33 @@ function PlanHill({
   const scale = PLAN.hillPx / HILL_R_MAX_M;
   const ghost = evaluateSite(DEFAULT_PIN_R_M, DEFAULT_PIN_BEARING_DEG);
   const showGhost = Math.hypot(site.xM - ghost.xM, site.yM - ghost.yM) > 8;
+  const { cx, cy, ringInner, ringOuter } = PLAN;
+  const ringMid = (ringInner + ringOuter) / 2;
 
-  const wedges = useMemo(() => {
-    return d3.range(16).map((i) => {
-      const a0 = (i * 22.5 - 90) * (Math.PI / 180);
-      const a1 = ((i + 1) * 22.5 - 90) * (Math.PI / 180);
-      const mid = i * 22.5 + 11.25;
-      const solar = solarClassAt(mid);
-      const inner = PLAN.ringInner;
-      const outer = PLAN.ringOuter;
-      const cx = PLAN.cx;
-      const cy = PLAN.cy;
-      const d = [
-        `M ${cx + inner * Math.cos(a0)} ${cy + inner * Math.sin(a0)}`,
-        `L ${cx + outer * Math.cos(a0)} ${cy + outer * Math.sin(a0)}`,
-        `A ${outer} ${outer} 0 0 1 ${cx + outer * Math.cos(a1)} ${cy + outer * Math.sin(a1)}`,
-        `L ${cx + inner * Math.cos(a1)} ${cy + inner * Math.sin(a1)}`,
-        `A ${inner} ${inner} 0 0 0 ${cx + inner * Math.cos(a0)} ${cy + inner * Math.sin(a0)}`,
-        "Z",
-      ].join(" ");
-      return { d, cls: solarWedgeClass(solar.code), key: i };
-    });
-  }, []);
-
-  const contours = [8, 20, 36, 48, 84, 110];
+  const sectors = [
+    {
+      key: "highest",
+      cls: "sun-wedge-highest",
+      from: SOLAR_HIGHEST_BEARING.fromDeg,
+      to: SOLAR_HIGHEST_BEARING.toDeg,
+    },
+    { key: "less", cls: "sun-wedge-less", from: 292.5, to: 67.5 },
+    { key: "more-se", cls: "sun-wedge-more", from: 67.5, to: 157.5 },
+    { key: "more-w", cls: "sun-wedge-more", from: 202.5, to: 292.5 },
+  ];
 
   function toPlan(xM: number, yM: number): { x: number; y: number } {
-    return { x: PLAN.cx + xM * scale, y: PLAN.cy - yM * scale };
+    return { x: cx + xM * scale, y: cy - yM * scale };
   }
 
   function setFromPointer(event: PointerEvent) {
     const svg = svgRef.current;
     if (!svg) return;
     const p = svgPoint(svg, event);
-    const xM = (p.x - PLAN.cx) / scale;
-    const yM = (PLAN.cy - p.y) / scale;
-    const polar = xyToPolar(xM, yM);
-    onMove(Math.min(HILL_R_MAX_M, polar.rM), polar.bearingDeg);
+    const xM = (p.x - cx) / scale;
+    const yM = (cy - p.y) / scale;
+    const polarPos = xyToPolar(xM, yM);
+    onMove(Math.min(HILL_R_MAX_M, polarPos.rM), polarPos.bearingDeg);
   }
 
   function onPointerDown(event: React.PointerEvent<SVGElement>) {
@@ -102,109 +127,158 @@ function PlanHill({
 
   const pin = toPlan(site.xM, site.yM);
   const ghostPt = toPlan(ghost.xM, ghost.yM);
-  const markerAngle = ((site.aspectDeg ?? site.bearingDeg) - 90) * (Math.PI / 180);
-  const markerR = (PLAN.ringInner + PLAN.ringOuter) / 2;
-  const marker = {
-    x: PLAN.cx + markerR * Math.cos(markerAngle),
-    y: PLAN.cy + markerR * Math.sin(markerAngle),
-  };
+  const tickBearing = site.aspectDeg ?? site.bearingDeg;
+  const tickInner = polar(cx, cy, ringInner - 2, tickBearing);
+  const tickOuter = polar(cx, cy, ringOuter + 6, tickBearing);
   const troughInner = 64 * scale;
   const troughOuter = 96 * scale;
+  const midS = toPlan(0, -FIXTURE_R.midSlope);
+  const troughS = toPlan(0, -FIXTURE_R.trough);
+  const apronS = toPlan(0, -110);
+  const steepS = toPlan(0, -64);
+  const labelN = polar(cx, cy, ringMid, 0);
+  const labelS = polar(cx, cy, ringMid, 180);
+  const labelE = polar(cx, cy, ringMid, 110);
+  const labelW = polar(cx, cy, ringMid, 250);
+  const pinLabelSide = site.xM >= 0 ? -1 : 1;
+  const pinLabelX = pin.x + pinLabelSide * 16;
+  const pinLabelAnchor = pinLabelSide < 0 ? "end" : "start";
 
   return (
     <section className="same-hill-plan" aria-label="Hill plan with solar-rank ring">
-      <h3>Sun-rank ring — solar class by aspect</h3>
       <svg
         ref={svgRef}
-        viewBox={`0 0 ${PLAN.size} ${PLAN.size}`}
+        viewBox={`0 0 ${PLAN.w} ${PLAN.h}`}
         role="img"
-        aria-label="Schematic hill. Drag the pin. Sun-rank ring shows solar class by facing."
+        aria-label="Schematic hill with aspect ring. Drag the pin. Solar class is labeled on the ring; slope bands and the trough are labeled on the hill."
       >
-        <circle className="hill-fill" cx={PLAN.cx} cy={PLAN.cy} r={PLAN.hillPx} />
-        <circle
-          className="trough-fill"
-          cx={PLAN.cx}
-          cy={PLAN.cy}
-          r={troughOuter}
-        />
-        <circle
-          className="hill-fill"
-          cx={PLAN.cx}
-          cy={PLAN.cy}
-          r={troughInner}
-        />
-        {contours.map((r) => (
-          <circle
-            key={r}
-            className="contour"
-            cx={PLAN.cx}
-            cy={PLAN.cy}
-            r={r * scale}
+        <circle className="hill-fill" cx={cx} cy={cy} r={PLAN.hillPx} />
+        <circle className="trough-fill" cx={cx} cy={cy} r={troughOuter} />
+        <circle className="hill-fill" cx={cx} cy={cy} r={troughInner} />
+        {[8, 20, 36, 48, 84, 110].map((r) => (
+          <circle key={r} className="contour" cx={cx} cy={cy} r={r * scale} />
+        ))}
+        {sectors.map((s) => (
+          <path
+            key={s.key}
+            className={s.cls}
+            d={annulusSector(cx, cy, ringInner, ringOuter, s.from, s.to)}
           />
         ))}
-        {wedges.map((w) => (
-          <path key={w.key} className={w.cls} d={w.d} />
-        ))}
-        <text className="label-ink" x={PLAN.cx} y={18} textAnchor="middle">
+        <text className="label-ink" x={cx} y={cy - PLAN.hillPx - 8} textAnchor="middle">
           N
         </text>
-        <text className="label-ink" x={PLAN.size - 14} y={PLAN.cy + 4} textAnchor="middle">
+        <text className="label-ink" x={cx + PLAN.hillPx + 12} y={cy + 4} textAnchor="start">
           E
         </text>
-        <text className="label-ink" x={PLAN.cx} y={PLAN.size - 8} textAnchor="middle">
+        <text className="label-ink" x={cx} y={cy + PLAN.hillPx + 16} textAnchor="middle">
           S
         </text>
-        <text className="label-ink" x={14} y={PLAN.cy + 4} textAnchor="middle">
+        <text className="label-ink" x={cx - PLAN.hillPx - 12} y={cy + 4} textAnchor="end">
           W
         </text>
         <text
-          className="label"
-          x={PLAN.cx}
-          y={PLAN.cy + 4}
+          className="ring-label"
+          x={labelS.x}
+          y={labelS.y + 4}
           textAnchor="middle"
         >
+          highest · SSE–SSW
+        </text>
+        <text
+          className="ring-label"
+          x={labelN.x}
+          y={labelN.y + 4}
+          textAnchor="middle"
+        >
+          less · N/NW/NE
+        </text>
+        <text
+          className="ring-label"
+          x={labelE.x}
+          y={labelE.y + 4}
+          textAnchor="middle"
+        >
+          more
+        </text>
+        <text
+          className="ring-label"
+          x={labelW.x}
+          y={labelW.y + 4}
+          textAnchor="middle"
+        >
+          more
+        </text>
+        <text className="label" x={cx} y={cy + 4} textAnchor="middle">
           ridge
         </text>
-        <text
-          className="label"
-          x={toPlan(0, -FIXTURE_R.midSlope).x}
-          y={toPlan(0, -FIXTURE_R.midSlope).y + 12}
-          textAnchor="middle"
-        >
-          south mid-slope
+        <text className="label" x={midS.x} y={midS.y + 3} textAnchor="middle">
+          5–15%
         </text>
-        <text
-          className="label"
-          x={toPlan(0, -FIXTURE_R.trough).x}
-          y={toPlan(0, -FIXTURE_R.trough).y + 12}
-          textAnchor="middle"
-        >
-          trough
+        <text className="label" x={steepS.x + 22} y={steepS.y + 3} textAnchor="start">
+          steeper
         </text>
-        {site.aspectDeg !== null && (
-          <circle className="ring-marker" cx={marker.x} cy={marker.y} r={5} />
-        )}
+        <text className="label-pool" x={troughS.x} y={troughS.y + 3} textAnchor="middle">
+          pocket
+        </text>
+        <text className="label" x={apronS.x} y={apronS.y + 3} textAnchor="middle">
+          &lt;1%
+        </text>
+        <line
+          className="ring-tick"
+          x1={tickInner.x}
+          y1={tickInner.y}
+          x2={tickOuter.x}
+          y2={tickOuter.y}
+        />
         {showGhost && (
           <>
-            <circle className="ghost" cx={ghostPt.x} cy={ghostPt.y} r={8} />
-            <text
-              className="label"
-              x={ghostPt.x + 12}
-              y={ghostPt.y - 8}
-            >
-              ghost: south mid-slope
+            <circle className="ghost" cx={ghostPt.x} cy={ghostPt.y} r={PIN_R} />
+            <text className="label" x={ghostPt.x + 12} y={ghostPt.y - 8}>
+              south mid-slope
             </text>
           </>
         )}
         <circle
           className="pin-hit"
-          cx={PLAN.cx}
-          cy={PLAN.cy}
-          r={PLAN.ringOuter}
+          cx={cx}
+          cy={cy}
+          r={ringOuter}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
         />
-        <circle className="pin" cx={pin.x} cy={pin.y} r={7} />
+        <circle className="pin" cx={pin.x} cy={pin.y} r={PIN_R} />
+        <text
+          className="pin-label"
+          x={pinLabelX}
+          y={pin.y - 10}
+          textAnchor={pinLabelAnchor}
+        >
+          facing {site.facing}
+        </text>
+        <text
+          className="pin-label"
+          x={pinLabelX}
+          y={pin.y + 4}
+          textAnchor={pinLabelAnchor}
+        >
+          {site.slopeBandLabel}
+        </text>
+        <text
+          className="pin-label"
+          x={pinLabelX}
+          y={pin.y + 18}
+          textAnchor={pinLabelAnchor}
+        >
+          solar {site.solarClass === 2 ? "highest" : site.solarClass === 1 ? "more" : site.solarClass === 0 ? "less" : "unranked"}
+        </text>
+        <text className="source-on-graphic" x={24} y={518}>
+          Jones Umpqua GIS (reused Rogue) — ordinal rank, not Willamette W/m²
+        </text>
+        <text className="source-on-graphic" x={24} y={534}>
+          10° south vs a flat site: up to {JONES_DUFF_SOUTH_VS_FLAT_INSOLATION_PCT}% more
+          insolation — not south vs north
+        </text>
       </svg>
     </section>
   );
@@ -218,7 +292,7 @@ function HillProfile({ site }: { site: SiteState }) {
     .range([PROFILE.m.left, PROFILE.w - PROFILE.m.right]);
   const y = d3
     .scaleLinear()
-    .domain([0, 17])
+    .domain([0, 17.5])
     .range([PROFILE.h - PROFILE.m.bottom, PROFILE.m.top]);
 
   const diameter = useMemo(() => {
@@ -233,8 +307,6 @@ function HillProfile({ site }: { site: SiteState }) {
     .y((p) => y(p.z));
 
   const poolPath = useMemo(() => {
-    const below = diameter.filter((p) => p.z < RLC_POCKET_Z_M);
-    if (below.length < 2) return undefined;
     const segs: (typeof diameter)[] = [];
     let cur: typeof diameter = [];
     for (const p of diameter) {
@@ -248,9 +320,11 @@ function HillProfile({ site }: { site: SiteState }) {
     if (cur.length) segs.push(cur);
     return segs
       .map((seg) => {
-        const start = { s: seg[0].s, z: RLC_POCKET_Z_M };
-        const end = { s: seg[seg.length - 1].s, z: RLC_POCKET_Z_M };
-        const pts = [start, ...seg, end];
+        const pts = [
+          { s: seg[0].s, z: RLC_POCKET_Z_M },
+          ...seg,
+          { s: seg[seg.length - 1].s, z: RLC_POCKET_Z_M },
+        ];
         const line = d3
           .line<(typeof pts)[number]>()
           .x((p) => x(p.s))
@@ -262,24 +336,16 @@ function HillProfile({ site }: { site: SiteState }) {
   }, [diameter, x, y]);
 
   const pinS = site.rM;
-  const pinZ = site.zM;
-  const opposite = evaluateSite(site.rM, site.bearingDeg + 180);
+  const midGhost = evaluateSite(FIXTURE_R.midSlope, site.bearingDeg);
+  const inPocket = site.frostClass === 1;
 
   return (
     <section className="same-hill-profile" aria-label="Hill profile with cold-air pool">
-      <h3>Hill profile — cold air pools in the trough</h3>
       <svg
         viewBox={`0 0 ${PROFILE.w} ${PROFILE.h}`}
         role="img"
-        aria-label="North–south style slice through the pin. Shaded pool is the frost pocket."
+        aria-label="Slice through the pin. Shaded trough is the frost pocket; mid-slope is drained."
       >
-        <line
-          className="axis"
-          x1={PROFILE.m.left}
-          x2={PROFILE.w - PROFILE.m.right}
-          y1={y(0)}
-          y2={y(0)}
-        />
         {poolPath && <path className="pool" d={poolPath} />}
         <line
           className="waterline"
@@ -289,20 +355,38 @@ function HillProfile({ site }: { site: SiteState }) {
           y2={y(RLC_POCKET_Z_M)}
         />
         <path className="ground" d={ground(diameter) ?? undefined} />
-        <circle className="pin" cx={x(pinS)} cy={y(pinZ)} r={6} />
-        <circle className="ghost" cx={x(-opposite.rM)} cy={y(opposite.zM)} r={5} />
-        <text className="label" x={x(-HILL_R_MAX_M) + 8} y={y(0) + 14}>
-          opposite face
+        <circle
+          className="ghost"
+          cx={x(midGhost.rM)}
+          cy={y(midGhost.zM)}
+          r={PIN_R}
+        />
+        <circle className="pin" cx={x(pinS)} cy={y(site.zM)} r={PIN_R} />
+        <text
+          className="label-pool"
+          x={x(FIXTURE_R.trough)}
+          y={y(4.6)}
+          textAnchor="middle"
+        >
+          pocket
         </text>
         <text
           className="label"
-          x={x(HILL_R_MAX_M) - 8}
-          y={y(0) + 14}
-          textAnchor="end"
+          x={x(FIXTURE_R.midSlope)}
+          y={y(midGhost.zM) - 10}
+          textAnchor="middle"
         >
-          this face ({site.facing})
+          drained
         </text>
-        <text className="label" x={x(0)} y={y(16) - 6} textAnchor="middle">
+        <text
+          className="pin-label"
+          x={x(pinS) + 10}
+          y={y(site.zM) + 4}
+        >
+          frost {site.frostClassLabel}
+          {inPocket ? ` · ${PENNER_ASH_FROST_HOURS_PCT}% of hours` : ""}
+        </text>
+        <text className="label" x={x(0)} y={y(16.2) - 4} textAnchor="middle">
           ridge
         </text>
         <text
@@ -311,7 +395,15 @@ function HillProfile({ site }: { site: SiteState }) {
           y={y(RLC_POCKET_Z_M) + 3}
           textAnchor="end"
         >
-          RLC 0.4
+          RLC {RLC_POCKET_THRESHOLD}
+        </text>
+        <text className="source-on-graphic" x={PROFILE.m.left} y={PROFILE.h - 36}>
+          Penner-Ash 2014: RLC &lt; {RLC_POCKET_THRESHOLD} = {PENNER_ASH_FROST_HOURS_PCT}% of
+          frost hours ({PENNER_ASH_LOGGER_COUNT} loggers / {PENNER_ASH_VINEYARD_COUNT} n. WV
+          vineyards)
+        </text>
+        <text className="source-on-graphic" x={PROFILE.m.left} y={PROFILE.h - 20}>
+          EM 8973: frost pockets via air drainage / elevation
         </text>
       </svg>
     </section>
@@ -324,7 +416,6 @@ export function SameHillExplorable() {
   const radiusId = useId();
   const bearingId = useId();
   const site = evaluateSite(rM, bearingDeg);
-
   const solarKey =
     site.solarClass === 2 ? "highest" : site.solarClass === 1 ? "more" : "less";
   const frostKey = site.frostClass === 1 ? "pocket" : "drained";
@@ -332,24 +423,6 @@ export function SameHillExplorable() {
   return (
     <div className="same-hill">
       <div className="same-hill-board">
-        <dl className="same-hill-state">
-          <div>
-            <dt>Facing</dt>
-            <dd data-testid="facing">{site.facing}</dd>
-          </div>
-          <div>
-            <dt>Slope band</dt>
-            <dd data-testid="slope-band">{site.slopeBandLabel}</dd>
-          </div>
-          <div data-solar={solarKey}>
-            <dt>Solar class</dt>
-            <dd data-testid="solar-class">{site.solarClassLabel}</dd>
-          </div>
-          <div data-frost={frostKey}>
-            <dt>Frost class</dt>
-            <dd data-testid="frost-class">{site.frostClassLabel}</dd>
-          </div>
-        </dl>
         <PlanHill
           site={site}
           onMove={(nextR, nextBearing) => {
@@ -358,48 +431,25 @@ export function SameHillExplorable() {
           }}
         />
         <HillProfile site={site} />
-        <p className="same-hill-legend">
-          <span className="highest">
-            <i />
-            highest solar (SSE–SSW)
+        <p
+          className="same-hill-state"
+          data-solar={solarKey}
+          data-frost={frostKey}
+        >
+          <span>
+            facing <strong data-testid="facing">{site.facing}</strong>
           </span>
-          <span className="more">
-            <i />
-            more (SE/SW/W/E)
+          <span>
+            slope <strong data-testid="slope-band">{site.slopeBandLabel}</strong>
           </span>
-          <span className="less">
-            <i />
-            less (N/NW/NE)
+          <span>
+            solar{" "}
+            <strong data-testid="solar-class">{site.solarClassLabel}</strong>
           </span>
-          <span className="pool">
-            <i />
-            frost pocket (relative lowness)
+          <span>
+            frost{" "}
+            <strong data-testid="frost-class">{site.frostClassLabel}</strong>
           </span>
-        </p>
-        <p className="same-hill-captions">
-          {site.frostHoursCaptionPct !== null && (
-            <>
-              <strong>
-                {PENNER_ASH_FROST_HOURS_PCT}% of frost hours
-              </strong>{" "}
-              in this study sat at RLC &lt; {RLC_POCKET_THRESHOLD} — Penner-Ash
-              &amp; Pogue 2014, {PENNER_ASH_LOGGER_COUNT} loggers /{" "}
-              {PENNER_ASH_VINEYARD_COUNT} northern Willamette vineyards. Sourced
-              caption, not a modeled percentage.{" "}
-            </>
-          )}
-          {site.southVsFlatInsolationCaptionPct !== null && (
-            <>
-              <strong>
-                Up to {JONES_DUFF_SOUTH_VS_FLAT_INSOLATION_PCT}% more insolation
-              </strong>{" "}
-              is 10° south versus a <strong>flat</strong> site (Jones &amp;
-              Duff) — not south versus north.{" "}
-            </>
-          )}
-          Jones solar ranking is Umpqua/Rogue GIS, not a Willamette
-          opposite-face measurement. Penner-Ash is northern WV loggers. Schematic
-          hill, not a survey you can site from.
         </p>
       </div>
       <label className="visually-hidden" htmlFor={radiusId}>

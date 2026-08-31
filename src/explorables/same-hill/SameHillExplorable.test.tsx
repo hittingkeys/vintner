@@ -3,14 +3,30 @@ import { SameHillExplorable } from "./SameHillExplorable";
 import { PENNER_ASH_FROST_HOURS_PCT } from "./constants";
 
 describe("SameHillExplorable", () => {
-  it("shows facing, slope band, solar class, and frost class on the canvas (A1)", () => {
+  it("shows facing, slope band, solar class, and frost class on the canvas (A1, F2)", () => {
     render(<SameHillExplorable />);
     expect(screen.getByTestId("facing")).toBeInTheDocument();
     expect(screen.getByTestId("slope-band")).toHaveTextContent("5–15%");
     expect(screen.getByTestId("solar-class")).toHaveTextContent(/highest/i);
     expect(screen.getByTestId("frost-class")).toHaveTextContent(/drained/i);
-    expect(screen.getByText(/sun-rank ring/i)).toBeInTheDocument();
-    expect(screen.getByText(/cold air pools/i)).toBeInTheDocument();
+    expect(screen.getByText(/highest · SSE–SSW/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/^pocket$/i).length).toBeGreaterThan(0);
+  });
+
+  it("labels solar classes on the ring so highest is compared to less (F8, F9)", () => {
+    render(<SameHillExplorable />);
+    expect(screen.getByText(/highest · SSE–SSW/i)).toBeInTheDocument();
+    expect(screen.getByText(/less · N\/NW\/NE/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/^more$/i).length).toBeGreaterThan(0);
+    expect(document.querySelector(".same-hill-legend")).toBeNull();
+  });
+
+  it("labels frost pocket against drained on the profile (F8, F9, E4)", () => {
+    render(<SameHillExplorable />);
+    expect(screen.getAllByText(/^pocket$/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/^drained$/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/5–15%/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/<1%/)).toBeInTheDocument();
   });
 
   it("has no run or calculate button (A2)", () => {
@@ -41,7 +57,11 @@ describe("SameHillExplorable", () => {
       target: { value: "180" },
     });
     expect(screen.getByTestId("frost-class")).toHaveTextContent(/pocket/i);
-    expect(screen.getByText(new RegExp(`${PENNER_ASH_FROST_HOURS_PCT}% of frost hours`))).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        new RegExp(`${PENNER_ASH_FROST_HOURS_PCT}% of frost hours`),
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/81\.00/)).not.toBeInTheDocument();
   });
 
@@ -62,18 +82,12 @@ describe("SameHillExplorable", () => {
     expect(screen.getByTestId("slope-band")).toHaveTextContent("<1%");
   });
 
-  it("10° south caption is vs a flat site, not vs north", () => {
+  it("10° south caption is vs a flat site, not vs north (F11)", () => {
     render(<SameHillExplorable />);
-    fireEvent.change(screen.getByLabelText(/distance from ridge/i), {
-      target: { value: "56" },
-    });
-    fireEvent.change(screen.getByLabelText(/bearing from north/i), {
-      target: { value: "180" },
-    });
-    const captions = document.querySelector(".same-hill-captions");
-    expect(captions?.textContent).toMatch(/25% more insolation/i);
-    expect(captions?.textContent).toMatch(/flat site/i);
-    expect(captions?.textContent).toMatch(/not south versus north/i);
+    const board = document.querySelector(".same-hill");
+    expect(board?.textContent).toMatch(/25% more/);
+    expect(board?.textContent).toMatch(/flat site/i);
+    expect(board?.textContent).toMatch(/not south vs north/i);
   });
 
   it("ridge is finite and drained", () => {
@@ -93,9 +107,19 @@ describe("SameHillExplorable", () => {
     expect(screen.queryByLabelText(/seasonal demand/i)).not.toBeInTheDocument();
   });
 
-  it("keeps Jones ranking uncertainty on the canvas", () => {
+  it("keeps Jones, Penner-Ash, and EM 8973 on the canvas (F11)", () => {
     render(<SameHillExplorable />);
-    expect(screen.getByText(/Umpqua\/Rogue GIS/i)).toBeInTheDocument();
-    expect(screen.getByText(/northern WV loggers/i)).toBeInTheDocument();
+    expect(screen.getByText(/Umpqua GIS/i)).toBeInTheDocument();
+    expect(screen.getByText(/Penner-Ash 2014/i)).toBeInTheDocument();
+    expect(screen.getByText(/n\. WV/i)).toBeInTheDocument();
+    expect(screen.getByText(/EM 8973/i)).toBeInTheDocument();
+    expect(screen.getByText(/air drainage/i)).toBeInTheDocument();
+  });
+
+  it("does not encode solar class as circle radius (F1)", () => {
+    render(<SameHillExplorable />);
+    const pins = document.querySelectorAll(".same-hill .pin");
+    const radii = [...pins].map((el) => el.getAttribute("r"));
+    expect(new Set(radii).size).toBe(1);
   });
 });

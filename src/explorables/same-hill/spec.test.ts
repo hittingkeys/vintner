@@ -22,6 +22,9 @@ describe("same-hill ExplorableSpec", () => {
     expect(spec.whatMustTheLearnerSee).toMatch(/A1/);
     expect(spec.whatDoTheyManipulate).toMatch(/A4/);
     expect(spec.whatIsTheResponseSpace).toMatch(/A3/);
+    expect(spec.whatIsTheResponseSpace).toMatch(/F8/);
+    expect(spec.whatIsTheResponseSpace).toMatch(/F9/);
+    expect(sameHillLessonIntent.rubric).toMatch(/F11/);
     expect(spec.whatHappensAtTheExtremes).toMatch(/A6/);
   });
 

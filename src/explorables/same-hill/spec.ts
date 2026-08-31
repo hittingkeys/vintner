@@ -12,8 +12,10 @@ import {
  * Beginner lesson: same hill, sun vs frost as two geometries.
  *
  * Brief answers (also in lesson frontmatter):
- * 1. Rubric — Part A (A1–A6). One in-flow Part B prompt (prediction/cause,
- *    not a definition card) after the board.
+ * 1. Rubric — Part A (A1–A6) plus Part F on the graphic (F1, F2, F4, F5,
+ *    F8, F9, F11, F12) and Part E question 4 (compared to what?). One
+ *    in-flow Part B prompt (prediction/cause, not a definition card)
+ *    after the board.
  * 2. What the learner was simulating — that “south-facing” is one knob that
  *    also means frost-safe.
  * 3. Misconception — south-facing = the warm, frost-safe site. Facing ranks
@@ -26,13 +28,13 @@ import {
  */
 export const sameHillSpec: ExplorableSpec = {
   whatMustTheLearnerSee:
-    "Part A (A1–A6). Hidden state on the canvas (A1), not a tooltip: current facing (16-wind), slope band (<1% / 5–15% / steeper), solar class (ordinal), and frost class (pocket vs drained). That confronts the misconception that south-facing is the same knob as frost-safe. Facing ranks solar receipt (Jones SSE–SSW highest); frost hours concentrate in topographic lows (air drainage / relative lowness), including on a south face if that face sits in a pocket. One Part B cause prompt sits after the board (not a definition card).",
+    "Part A (A1–A6) and Part F. Hidden state on the canvas (A1, F2), not a tooltip: current facing (16-wind), slope band (<1% / 5–15% / steeper), solar class (ordinal), and frost class (pocket vs drained) — labeled in the data region (F8), quieter in a one-line readout, not a legend. Comparison is on screen unaided (F9, E4): solar class vs the full aspect ring (highest SSE–SSW against less N/NW/NE); frost class vs the hill profile pocket. That confronts the misconception that south-facing is the same knob as frost-safe. One Part B cause prompt sits after the board (not a definition card).",
 
   whatDoTheyManipulate:
     "The pin on the hill itself (A4): drag it on the plan view. Radius and bearing are the same quantity — position on the schematic — not a sidebar of climate layers. No Run/Calculate/Play button (A2). Not coupled: occupied PAW, vine, weather year, Van Duzer, Winkler/GDD, variety, AVA, minerality, irrigation, wine style, Carto tiles, soils Leaflet map.",
 
   whatIsTheResponseSpace:
-    "Two geometries, both always on the canvas (A3): (1) a sun-rank ring around the hill — solar class by aspect, with a marker at current facing — so highest vs less is visible without further dragging; (2) a hill profile where cold air fills the concave/floor up to the RLC = 0.4 contour, with the pin on that slice. Ghost: a south mid-slope comparison mark when the live pin is elsewhere. Uncertainty on the canvas (Part D — no faux-precision GDD): Jones solar ranking is Umpqua/Rogue GIS, not a Willamette opposite-face measurement; Penner-Ash is northern WV loggers; 25% is 10° south vs a flat site (Jones & Duff), not south vs north. 81% appears when the pin is in the low, as a sourced caption, not 81.00.",
+    "The form is a hill plus aspect ring (F12), not a chart-library bar or pie. Two geometries carry the space (A3, F4, F5): (1) an equal-thickness sun-rank ring — ordinal class by aspect, tick at current facing; a lone “highest” label is a fail (F9); (2) a hill profile where cold air fills the concave/floor up to the RLC = 0.4 contour. Ring thickness/pin radius do not encode class (F1). Ghost pin is a supplement, not the only comparison (F5). Sources on the canvas (F11): Jones Umpqua GIS; 10° south vs a flat site up to 25% more insolation (not south vs north); Penner-Ash 2014 RLC < 0.4 = 81% of frost hours; EM 8973 frost pockets via air drainage. 81% is a sourced caption, not 81.00. No legend component (F8).",
 
   whatHappensAtTheExtremes:
     "Pin at ridge/summit: drained (high relative elevation); facing may be ridge / unranked; no NaN (A6). Pin at floor/trough: frost class = pocket at any facing, including south. Pin full north, mid-slope: solar class less; frost still drained. Pin SSE–SSW, mid-slope: solar highest; frost drained. Slope band <1% on the apron (Jones poor cold-air drainage) and steeper than 15% on the inner trough wall. The pocket fill is not clipped off the profile. A south-face pin in the trough does not un-frost the trough.",
@@ -148,7 +150,7 @@ export const sameHillSpec: ExplorableSpec = {
 /** Brief fields that also live on LessonFrontmatter. */
 export const sameHillLessonIntent = {
   rubric:
-    "Part A (A1–A6). One in-flow Part B cause prompt after the board (not a definition card). Anti-pastiche (Part D): no dashboard of extra climate layers; no hover-only state; no faux-precision GDD; prose must not carry the lesson if the interactive is deleted.",
+    "Part A (A1–A6) and Part F (F1 equal-thickness ring, F2 quiet readout, F4 ring+profile carry the space, F5 comparison without memory, F8 labels in the data, F9 compared-to-what on screen, F11 sources on canvas, F12 hill+ring not a pie). Part E4: the graphic answers compared to what? unaided. One in-flow Part B cause prompt after the board. Anti-pastiche (Part D): no legend, no dashboard of extra climate layers, no hover-only state, no faux-precision GDD.",
   whatTheLearnerWasSimulating:
     "That south-facing is the same knob as frost-safe — one ranking that decides both solar receipt and frost hours.",
   misconception:
