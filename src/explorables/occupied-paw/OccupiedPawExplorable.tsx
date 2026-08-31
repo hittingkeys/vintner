@@ -404,7 +404,7 @@ function ProfilePit({
           <span className="band-note">
             {" "}
             · default MU {formatCm(JORY_PAWS_RANGE_CM.min)} · range{" "}
-            {formatCm(JORY_PAWS_RANGE_CM.min)}–{formatCm(JORY_PAWS_RANGE_CM.max)}{" "}
+            {JORY_PAWS_RANGE_CM.min}–{JORY_PAWS_RANGE_CM.max} cm{" "}
             · other MUs {JORY_OTHER_MU_PAWS_CM.map((n) => `${n}`).join(", ")} cm
           </span>
         )}

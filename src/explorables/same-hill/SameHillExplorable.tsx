@@ -131,24 +131,30 @@ function PlanHill({
   // A2: keep capture on the SVG for the whole gesture, even after leaving .pin-hit.
   function onPointerDown(event: React.PointerEvent<SVGSVGElement>) {
     dragging.current = true;
-    event.currentTarget.setPointerCapture(event.pointerId);
+    const target = event.currentTarget;
+    if (typeof target.setPointerCapture === "function") {
+      target.setPointerCapture(event.pointerId);
+    }
     setFromPointer(event.nativeEvent);
   }
 
   function onPointerMove(event: React.PointerEvent<SVGSVGElement>) {
-    if (
-      !dragging.current &&
-      !event.currentTarget.hasPointerCapture(event.pointerId)
-    ) {
-      return;
-    }
+    const captured =
+      typeof event.currentTarget.hasPointerCapture === "function" &&
+      event.currentTarget.hasPointerCapture(event.pointerId);
+    if (!dragging.current && !captured) return;
     setFromPointer(event.nativeEvent);
   }
 
   function onPointerUp(event: React.PointerEvent<SVGSVGElement>) {
     dragging.current = false;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+    const target = event.currentTarget;
+    if (
+      typeof target.hasPointerCapture === "function" &&
+      typeof target.releasePointerCapture === "function" &&
+      target.hasPointerCapture(event.pointerId)
+    ) {
+      target.releasePointerCapture(event.pointerId);
     }
   }
 
