@@ -137,8 +137,24 @@ describe("WillametteSoilsExplorable", () => {
     expect(screen.getAllByText(/NAD27/i)).toHaveLength(1);
     expect(screen.getByText(/snapshot 2025-10-04/)).toBeInTheDocument();
     expect(document.querySelector(".extent-legend")).toBeNull();
-    expect(document.querySelectorAll(".type-pin-name")).toHaveLength(3);
-    expect(document.querySelector('.type-pin-name')?.textContent).toMatch(/Jory|Willakenzie|Laurelwood/);
+    expect(document.querySelectorAll(".type-pin-name")).toHaveLength(0);
+    expect(
+      document.querySelectorAll('[data-extent-label="jory"]').length,
+    ).toBeGreaterThan(1);
+    expect(
+      document.querySelectorAll('[data-extent-label="willakenzie"]').length,
+    ).toBeGreaterThan(0);
+    expect(
+      document.querySelectorAll('[data-extent-label="laurelwood"]').length,
+    ).toBeGreaterThan(0);
+    expect(
+      document.querySelector(
+        '[data-extent-label="jory"][data-south-of-view="true"]',
+      ),
+    ).toBeTruthy();
+    expect(
+      document.querySelector('[data-extent-label="jory"]')?.textContent,
+    ).toMatch(/Jory/);
     expect(screen.queryByText(/CARTO/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Positron/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/OpenStreetMap \(CARTO/i)).not.toBeInTheDocument();

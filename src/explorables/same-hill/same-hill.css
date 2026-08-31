@@ -67,8 +67,8 @@
 }
 
 .same-hill .trough-fill {
-  fill: #8aa0b4;
-  opacity: 0.45;
+  fill: var(--pool);
+  opacity: 0.58;
 }
 
 .same-hill .contour {
@@ -137,6 +137,12 @@
 }
 
 .same-hill .ring-label {
+  fill: var(--ink);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.same-hill .downhill-label {
   fill: var(--ink);
   font-size: 9px;
   font-weight: 650;

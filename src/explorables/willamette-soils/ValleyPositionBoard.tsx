@@ -19,15 +19,25 @@ import { JORY, LAURELWOOD, WILLAKENZIE, type SeriesId } from "./model";
 import {
   SERIES_EXTENTS,
   WILLAMETTE_VIEW,
+  extentLabelSites,
 } from "./series-extent";
 
+/** F7: identity is not hue-only — value + stroke dash differ in greyscale. */
 const EXTENT_STYLE: Record<
   SeriesId,
-  { fill: string; className: string }
+  { fill: string; className: string; dashArray?: string }
 > = {
-  jory: { fill: "#c48a7a", className: "extent-jory" },
-  willakenzie: { fill: "#c4a07a", className: "extent-willakenzie" },
-  laurelwood: { fill: "#b4aea6", className: "extent-laurelwood" },
+  jory: { fill: "#8f5548", className: "extent-jory" },
+  willakenzie: {
+    fill: "#d4c4a4",
+    className: "extent-willakenzie",
+    dashArray: "7 4",
+  },
+  laurelwood: {
+    fill: "#9a9590",
+    className: "extent-laurelwood",
+    dashArray: "1.5 3.5",
+  },
 };
 
 const ESRI_WORLD_TOPO =
@@ -46,13 +56,15 @@ function seriesForLandform(id: LandformId): SeriesId | null {
 }
 
 function extentStyle(seriesId: SeriesId, selected: boolean): L.PathOptions {
+  const spec = EXTENT_STYLE[seriesId];
   return {
-    className: EXTENT_STYLE[seriesId].className,
+    className: spec.className,
     color: "#3d3832",
-    weight: selected ? 2.5 : 1,
-    fillColor: EXTENT_STYLE[seriesId].fill,
-    fillOpacity: selected ? 0.72 : 0.42,
+    weight: selected ? 2.5 : 1.4,
+    fillColor: spec.fill,
+    fillOpacity: selected ? 0.78 : 0.52,
     opacity: 1,
+    dashArray: spec.dashArray,
   };
 }
 
@@ -62,9 +74,14 @@ const PIN_NAME: Record<SeriesId, string> = {
   laurelwood: LAURELWOOD.name,
 };
 
-/** F8: series name on the type-location pin, not a legend. Not a map overlay. */
+/** Pins are type-location only. Series names sit on the polygons (F8). */
 function pinHtml(seriesId: SeriesId, selected: boolean): string {
-  return `<span class="type-pin-mark"><span class="type-pin-btn" data-pin="${seriesId}" data-selected="${selected ? "true" : "false"}"></span><span class="type-pin-name">${PIN_NAME[seriesId]}</span></span>`;
+  return `<span class="type-pin-btn" data-pin="${seriesId}" data-selected="${selected ? "true" : "false"}"></span>`;
+}
+
+function extentNameHtml(seriesId: SeriesId, southOfInitialView: boolean): string {
+  const south = southOfInitialView ? "true" : "false";
+  return `<span class="extent-name-label" data-extent-label="${seriesId}" data-south-of-view="${south}">${PIN_NAME[seriesId]}</span>`;
 }
 
 export function ValleyPositionBoard({
@@ -126,6 +143,22 @@ export function ValleyPositionBoard({
       layersRef.current[seriesId] = layer;
     }
 
+    for (const seriesId of layerOrder) {
+      for (const site of extentLabelSites(seriesId)) {
+        L.marker([site.lat, site.lon], {
+          icon: L.divIcon({
+            className: "extent-name",
+            html: extentNameHtml(seriesId, site.southOfInitialView),
+            iconSize: [0, 0],
+            iconAnchor: [0, 0],
+          }),
+          interactive: false,
+          keyboard: false,
+          zIndexOffset: 250,
+        }).addTo(map);
+      }
+    }
+
     for (const pin of TYPE_LOCATION_PINS) {
       const { lat, lon } = typeLocationLonLat(pin.location);
       const label = `${pin.location.county} County type location — ${pin.seriesId}`;
@@ -133,8 +166,8 @@ export function ValleyPositionBoard({
         icon: L.divIcon({
           className: "type-pin",
           html: pinHtml(pin.seriesId, false),
-          iconSize: [92, 20],
-          iconAnchor: [8, 10],
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
         }),
         keyboard: true,
         title: label,
@@ -205,8 +238,8 @@ export function ValleyPositionBoard({
         L.divIcon({
           className: "type-pin",
           html: pinHtml(pin.seriesId, pinSelected),
-          iconSize: [92, 20],
-          iconAnchor: [8, 10],
+          iconSize: [16, 16],
+          iconAnchor: [8, 8],
         }),
       );
       const markerEl = marker.getElement();

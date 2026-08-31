@@ -83,15 +83,15 @@ function ProfilePit({
   onDrip: (on: boolean) => void;
 }) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const width = 320;
+  const width = 352;
   const height = 460;
-  const m = { top: 18, right: 12, bottom: 22, left: 42 };
+  const m = { top: 18, right: 12, bottom: 22, left: 100 };
   const y = d3
     .scaleLinear()
     .domain([0, DEPTH_AXIS_MAX_CM])
     .range([m.top, height - m.bottom]);
-  const colX = 52;
-  const colW = 132;
+  const colX = 108;
+  const colW = 128;
   const extractable = result.extractableDepthCm;
   const surface = y(0);
   const extractY = y(extractable);
@@ -106,12 +106,24 @@ function ProfilePit({
     series.id === "jory" ? JORY_PAWS_REFERENCE_CM : WILLAKENZIE_CR_CM;
   const maxDrag = series.id === "jory" ? DEPTH_AXIS_MAX_CM : WILLAKENZIE_CR_CM;
 
+  const ageStops = [
+    { cm: YOUNG_PRESET_CM, name: "Young", inches: 16, tick: "16 in Young" },
+    {
+      cm: establishedCm,
+      name: "Established",
+      inches: Math.round(cmToIn(establishedCm)),
+      tick:
+        series.id === "jory" ? "60 in Established" : "32 in Cr Established",
+    },
+  ] as const;
+
   const depthTicks = [
     { cm: 0, label: "0 in" },
     { cm: 60, label: `24 in · ${formatCm(60)}` },
     { cm: 100, label: "1.0 m" },
-    { cm: JORY_PAWS_REFERENCE_CM, label: "60 in" },
-    { cm: WILLAKENZIE_CR_CM, label: "32 in Cr" },
+    ...(series.id === "jory"
+      ? [{ cm: WILLAKENZIE_CR_CM, label: "32 in Cr" }]
+      : [{ cm: JORY_PAWS_REFERENCE_CM, label: "60 in" }]),
     { cm: FAO56_WINE_GRAPE_ZR_CM.max, label: "2.0 m" },
   ];
 
@@ -341,39 +353,39 @@ function ProfilePit({
             </text>
           </g>
         ))}
-        {/* A4: Young / Established as labeled stops on the pit depth axis. */}
-        {(
-          [
-            { cm: YOUNG_PRESET_CM, label: "Young", inches: 16 },
-            {
-              cm: establishedCm,
-              label: "Established",
-              inches: Math.round(cmToIn(establishedCm)),
-            },
-          ] as const
-        ).map((stop) => {
+        {/* A4 / F8: age-stop names on the left depth ticks, not beside drag. */}
+        {ageStops.map((stop) => {
           const pressed = Math.abs(occupiedDepthCm - stop.cm) < 0.5;
           return (
-            <text
-              key={stop.label}
-              className="age-stop"
-              role="button"
-              tabIndex={0}
-              aria-pressed={pressed}
-              aria-label={`${stop.label}, ${stop.inches} inches`}
-              x={colX + colW + 16}
-              y={y(stop.cm) + 3}
-              data-pressed={pressed ? "true" : "false"}
-              onClick={() => onDepth(stop.cm)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  onDepth(stop.cm);
-                }
-              }}
-            >
-              {stop.label}
-            </text>
+            <g key={stop.name}>
+              <line
+                className="depth-tick"
+                x1={m.left - 6}
+                x2={m.left}
+                y1={y(stop.cm)}
+                y2={y(stop.cm)}
+              />
+              <text
+                className="age-stop"
+                role="button"
+                tabIndex={0}
+                aria-pressed={pressed}
+                aria-label={`${stop.name}, ${stop.inches} inches`}
+                x={m.left - 8}
+                y={y(stop.cm) + 3}
+                textAnchor="end"
+                data-pressed={pressed ? "true" : "false"}
+                onClick={() => onDepth(stop.cm)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onDepth(stop.cm);
+                  }
+                }}
+              >
+                {stop.tick}
+              </text>
+            </g>
           );
         })}
         {/* A4: drip toggle on the water column / RAW line, not a button row. */}
@@ -470,8 +482,8 @@ function DemandResponse({
   const svgRef = useRef<SVGSVGElement>(null);
   const demandId = useId();
   const width = 720;
-  const height = 292;
-  const m = { top: 16, right: 16, bottom: 78, left: 44 };
+  const height = 308;
+  const m = { top: 16, right: 16, bottom: 94, left: 44 };
   const x = d3
     .scaleLinear()
     .domain([0, DEMAND_AXIS_MAX_IN])
@@ -582,18 +594,15 @@ function DemandResponse({
     high: joryHigh[i].r,
   }));
 
-  const grapeDemandCm = formatCm(inToCm(AGRIMET_ETC_GRAPE_IN.a));
-  const anchors: { inches: number; label: string; extra?: string }[] = [
-    { inches: MCMINNVILLE_JUN_SEP_P_IN, label: "P 3.23" },
-    {
-      inches: AGRIMET_ETC_GRAPE_IN.a,
-      label: "grape 18.3",
-      extra: grapeDemandCm,
-    },
-    { inches: AGRIMET_ETC_GRAPE_IN.b, label: "19.6" },
-    { inches: AGRIMET_ETR_ARAO_JUNSEP_IN, label: "ETr 24.02" },
-    { inches: AGRIMET_ETR_FOGO_JUNSEP_IN, label: "25.61" },
+  const anchors: { inches: number; label: string; stagger: number }[] = [
+    { inches: MCMINNVILLE_JUN_SEP_P_IN, label: "P 3.23", stagger: 0 },
+    { inches: AGRIMET_ETC_GRAPE_IN.a, label: "grape 18.3", stagger: 0 },
+    { inches: AGRIMET_ETC_GRAPE_IN.b, label: "19.6", stagger: 12 },
+    { inches: AGRIMET_ETR_ARAO_JUNSEP_IN, label: "ETr 24.02", stagger: 0 },
+    { inches: AGRIMET_ETR_FOGO_JUNSEP_IN, label: "25.61", stagger: 12 },
   ];
+  const grapeMidX = x((AGRIMET_ETC_GRAPE_IN.a + AGRIMET_ETC_GRAPE_IN.b) / 2);
+  const etrMidX = x((AGRIMET_ETR_ARAO_JUNSEP_IN + AGRIMET_ETR_FOGO_JUNSEP_IN) / 2);
 
   function setFromPointer(event: PointerEvent) {
     const svg = svgRef.current;
@@ -664,23 +673,29 @@ function DemandResponse({
             <text
               className="label"
               x={x(a.inches)}
-              y={height - m.bottom + 22}
+              y={height - m.bottom + 22 + a.stagger}
               textAnchor="middle"
             >
               {a.label}
             </text>
-            {a.extra ? (
-              <text
-                className="label"
-                x={x(a.inches)}
-                y={height - m.bottom + 34}
-                textAnchor="middle"
-              >
-                {a.extra}
-              </text>
-            ) : null}
           </g>
         ))}
+        <text
+          className="source-on-graphic tick-source"
+          x={grapeMidX}
+          y={height - m.bottom + 48}
+          textAnchor="middle"
+        >
+          Levin {LEVIN_SOUTHERN_OR_MEASURED_IN} vs {LEVIN_SOUTHERN_OR_AGRIMET_IN} (not NVW)
+        </text>
+        <text
+          className="source-on-graphic tick-source"
+          x={etrMidX}
+          y={height - m.bottom + 48}
+          textAnchor="middle"
+        >
+          AgriMet ARAO/FOGO
+        </text>
         <path className="band" d={area(band) ?? undefined} />
         <path
           className="age-ghost"
