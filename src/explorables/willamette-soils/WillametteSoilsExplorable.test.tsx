@@ -115,4 +115,91 @@ describe("WillametteSoilsExplorable", () => {
       screen.getByText(/does not list vineyards among typical uses/i),
     ).toBeInTheDocument();
   });
+
+  it("shows all landform belts when nothing is selected (extreme)", () => {
+    render(<WillametteSoilsExplorable />);
+    expect(document.querySelector('[data-landform="surrounding-foothills"]')).toBeTruthy();
+    expect(document.querySelector('[data-landform="western-margin-hills"]')).toBeTruthy();
+    expect(document.querySelector('[data-landform="eastern-southern-margins"]')).toBeTruthy();
+    expect(document.querySelector('[data-landform="northwest-margin-hills"]')).toBeTruthy();
+    expect(document.querySelector('[data-landform="valley-floor"]')).toBeTruthy();
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
+      "none",
+    );
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-geography-state")).toBe(
+      "unselected",
+    );
+    expect(document.querySelectorAll('.pit-head[data-selected="true"]')).toHaveLength(0);
+    expect(
+      screen.getAllByText(/OSD geographic setting, not a soil survey/i).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("floor click is a distinct state and does not highlight a pit as Jory", () => {
+    render(<WillametteSoilsExplorable />);
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /valley floor — not jory, willakenzie, or laurelwood/i,
+      }),
+    );
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
+      "none",
+    );
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-geography-state")).toBe(
+      "valley-floor",
+    );
+    expect(document.querySelectorAll('.pit-head[data-selected="true"]')).toHaveLength(0);
+    expect(document.querySelector('.pit-head[data-series="jory"]')?.getAttribute("data-selected")).toBe(
+      "false",
+    );
+    expect(screen.getByText(/none of these three/i)).toBeInTheDocument();
+    expect(screen.getByText(/Woodburn/i)).toBeInTheDocument();
+    expect(screen.queryByText(/too many nutrients/i)).not.toBeInTheDocument();
+  });
+
+  it("Jory selection shows the Umpqua caption so Jory is not Willamette-only", () => {
+    render(<WillametteSoilsExplorable />);
+    fireEvent.click(screen.getByRole("button", { name: /surrounding foothills — jory/i }));
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
+      "jory",
+    );
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-geography-state")).toBe(
+      "surrounding-foothills",
+    );
+    expect(
+      document.querySelector('.pit-head[data-series="jory"]')?.getAttribute("data-selected"),
+    ).toBe("true");
+    expect(
+      document.querySelector('.pit-head[data-series="willakenzie"]')?.getAttribute("data-selected"),
+    ).toBe("false");
+    const umpqua = document.querySelector("[data-umpqua-caption]");
+    expect(umpqua).toBeTruthy();
+    expect(umpqua?.textContent).toMatch(/Umpqua/i);
+    expect(screen.getByText(/Marion County/i)).toBeInTheDocument();
+  });
+
+  it("type-location pin and belt share selection with the matching pit", () => {
+    render(<WillametteSoilsExplorable />);
+    fireEvent.click(
+      screen.getByRole("button", { name: /Washington County type location/i }),
+    );
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
+      "laurelwood",
+    );
+    expect(
+      document.querySelector('.pit-head[data-series="laurelwood"]')?.getAttribute("data-selected"),
+    ).toBe("true");
+    expect(screen.getByText(/Washington County/i)).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: /western-margin hills — willakenzie, spencer/i,
+      }),
+    );
+    expect(document.querySelector(".willamette-soils")?.getAttribute("data-highlighted-series")).toBe(
+      "willakenzie",
+    );
+    expect(document.querySelector(".valley-payload")?.textContent).toMatch(
+      /Spencer/,
+    );
+  });
 });
