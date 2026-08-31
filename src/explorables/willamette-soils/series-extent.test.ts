@@ -8,6 +8,7 @@ import {
   extentBbox,
   extentFeature,
   inWillametteTrough,
+  extentLabelSites,
   seriesGridsizeDeg,
 } from "./series-extent";
 
@@ -43,6 +44,18 @@ describe("SoilWeb series-extent vendor files", () => {
     expect(laurel.south).toBeCloseTo(45.271, 2);
     expect(laurel.east).toBeCloseTo(-122.516, 2);
     expect(laurel.north).toBeCloseTo(45.707, 2);
+  });
+
+  it("labels major blobs, including Jory south of the initial view (F8)", () => {
+    const jory = extentLabelSites("jory");
+    const will = extentLabelSites("willakenzie");
+    const laurel = extentLabelSites("laurelwood");
+    expect(jory.length).toBeGreaterThan(1);
+    expect(will.length).toBeGreaterThan(0);
+    expect(laurel.length).toBeGreaterThan(0);
+    expect(jory.some((s) => s.southOfInitialView)).toBe(true);
+    expect(jory.some((s) => s.lat < WILLAMETTE_VIEW.south)).toBe(true);
+    expect(jory.length + will.length + laurel.length).toBeLessThan(20);
   });
 
   it("Willamette view is Portland–Eugene, not all of Oregon", () => {

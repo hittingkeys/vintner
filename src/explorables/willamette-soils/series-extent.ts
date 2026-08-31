@@ -194,6 +194,122 @@ export function seriesContaining(lon: number, lat: number): SeriesId[] {
   return hits;
 }
 
+/** F8: series name on major extent blobs. Not a new GeoJSON layer. */
+export interface ExtentLabelSite {
+  seriesId: SeriesId;
+  lon: number;
+  lat: number;
+  southOfInitialView: boolean;
+}
+
+function ringAreaAbs(ring: number[][]): number {
+  let a = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[j]?.[0];
+    const yi = ring[j]?.[1];
+    const xj = ring[i]?.[0];
+    const yj = ring[i]?.[1];
+    if (xi == null || yi == null || xj == null || yj == null) continue;
+    a += xi * yj - xj * yi;
+  }
+  return Math.abs(a / 2);
+}
+
+function ringCentroid(ring: number[][]): { lon: number; lat: number } {
+  let a = 0;
+  let cx = 0;
+  let cy = 0;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const x0 = ring[j]?.[0];
+    const y0 = ring[j]?.[1];
+    const x1 = ring[i]?.[0];
+    const y1 = ring[i]?.[1];
+    if (x0 == null || y0 == null || x1 == null || y1 == null) continue;
+    const f = x0 * y1 - x1 * y0;
+    a += f;
+    cx += (x0 + x1) * f;
+    cy += (y0 + y1) * f;
+  }
+  a *= 0.5;
+  if (Math.abs(a) < 1e-18) {
+    let sx = 0;
+    let sy = 0;
+    let n = 0;
+    for (const p of ring) {
+      if (p[0] == null || p[1] == null) continue;
+      sx += p[0];
+      sy += p[1];
+      n += 1;
+    }
+    return { lon: n ? sx / n : 0, lat: n ? sy / n : 0 };
+  }
+  return { lon: cx / (6 * a), lat: cy / (6 * a) };
+}
+
+function labelPointOnRing(ring: number[][]): { lon: number; lat: number } {
+  const c = ringCentroid(ring);
+  if (pointInRing(c.lon, c.lat, ring)) return c;
+  let west = Infinity;
+  let south = Infinity;
+  let east = -Infinity;
+  let north = -Infinity;
+  for (const p of ring) {
+    if (p[0] == null || p[1] == null) continue;
+    west = Math.min(west, p[0]);
+    east = Math.max(east, p[0]);
+    south = Math.min(south, p[1]);
+    north = Math.max(north, p[1]);
+  }
+  const mid = { lon: (west + east) / 2, lat: (south + north) / 2 };
+  if (pointInRing(mid.lon, mid.lat, ring)) return mid;
+  return { lon: ring[0]?.[0] ?? c.lon, lat: ring[0]?.[1] ?? c.lat };
+}
+
+const LABEL_AREA_FRAC = 0.12;
+const LABEL_MAX_PER_SERIES = 6;
+
+/**
+ * Repeat the series name on major MultiPolygon blobs, including Jory
+ * south of the Portland–Eugene initial view. Computed from the vendored
+ * extent coordinates — not an extra GeoJSON overlay.
+ */
+export function extentLabelSites(seriesId: SeriesId): ExtentLabelSite[] {
+  const polygons = extentFeature(SERIES_EXTENTS[seriesId]).geometry.coordinates;
+  const blobs = polygons
+    .map((polygon) => {
+      const outer = polygon[0];
+      if (!outer || outer.length < 3) return null;
+      const area = ringAreaAbs(outer);
+      const pt = labelPointOnRing(outer);
+      return { area, lon: pt.lon, lat: pt.lat };
+    })
+    .filter((b): b is { area: number; lon: number; lat: number } => b != null)
+    .sort((a, b) => b.area - a.area);
+
+  const maxArea = blobs[0]?.area ?? 0;
+  const cutoff = maxArea * LABEL_AREA_FRAC;
+  const picked: { area: number; lon: number; lat: number }[] = [];
+  for (const blob of blobs) {
+    if (picked.length >= LABEL_MAX_PER_SERIES) break;
+    if (blob.area >= cutoff) picked.push(blob);
+  }
+  if (seriesId === "jory") {
+    const south = blobs.find((b) => b.lat < WILLAMETTE_VIEW.south);
+    if (
+      south &&
+      !picked.some((p) => p.lon === south.lon && p.lat === south.lat)
+    ) {
+      picked.push(south);
+    }
+  }
+  return picked.map((b) => ({
+    seriesId,
+    lon: b.lon,
+    lat: b.lat,
+    southOfInitialView: b.lat < WILLAMETTE_VIEW.south,
+  }));
+}
+
 export function seriesGridsizeDeg(id: SeriesId): number {
   return extentFeature(SERIES_EXTENTS[id]).properties.gridsize;
 }

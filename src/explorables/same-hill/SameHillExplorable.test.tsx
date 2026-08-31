@@ -129,6 +129,17 @@ describe("SameHillExplorable", () => {
     expect(Number(inner?.getAttribute("r"))).toBeLessThan(
       Number(frost?.getAttribute("r")),
     );
+    const pocket = document.querySelector("[data-pocket-on-fill]");
+    expect(pocket?.textContent).toMatch(/^pocket$/);
+    const cx = 240;
+    const cy = 248;
+    const pocketR = Math.hypot(
+      Number(pocket?.getAttribute("x")) - cx,
+      Number(pocket?.getAttribute("y")) - cy,
+    );
+    expect(pocketR).toBeGreaterThan(Number(inner?.getAttribute("r")));
+    expect(document.querySelector("[data-downhill-tick]")).toBeTruthy();
+    expect(screen.getByText(/^downhill$/)).toBeInTheDocument();
   });
 
   it("10° south caption is vs a flat site, not vs north (F11)", () => {
@@ -137,6 +148,7 @@ describe("SameHillExplorable", () => {
     expect(board?.textContent).toMatch(/25% more/);
     expect(board?.textContent).toMatch(/flat site/i);
     expect(board?.textContent).toMatch(/not south vs north/i);
+    expect(board?.textContent).toMatch(/Jones & Duff 2007/);
   });
 
   it("ridge is finite and drained", () => {
@@ -162,7 +174,7 @@ describe("SameHillExplorable", () => {
     expect(screen.getByText(/Umpqua GIS/i)).toBeInTheDocument();
     expect(screen.getByText(/Penner-Ash 2014/i)).toBeInTheDocument();
     expect(screen.getByText(/n\. WV/i)).toBeInTheDocument();
-    expect(screen.getByText(/EM 8973/i)).toBeInTheDocument();
+    expect(screen.getByText(/OSU EM 8973 \(rev\. 2022\)/)).toBeInTheDocument();
     expect(screen.getByText(/air drainage/i)).toBeInTheDocument();
   });
 

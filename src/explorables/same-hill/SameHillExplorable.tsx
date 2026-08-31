@@ -163,11 +163,12 @@ function PlanHill({
   const tickBearing = site.aspectDeg ?? site.bearingDeg;
   const tickInner = polar(cx, cy, ringInner - 2, tickBearing);
   const tickOuter = polar(cx, cy, ringOuter + 6, tickBearing);
+  const downhillLabelPt = polar(cx, cy, ringOuter + 20, tickBearing);
   const pocketInnerPx = frostPocketInnerRM() * scale;
   const midS = toPlan(0, -FIXTURE_R.midSlope);
-  const troughS = toPlan(0, -FIXTURE_R.trough);
-  const apronS = toPlan(0, -110);
   const steepS = toPlan(0, -64);
+  const pocketOnFill = toPlan(0, -120);
+  const apronS = toPlan(0, -110);
   const labelN = polar(cx, cy, ringMid, 0);
   const labelS = polar(cx, cy, ringMid, 180);
   const labelE = polar(cx, cy, ringMid, 110);
@@ -270,19 +271,36 @@ function PlanHill({
         <text className="label" x={steepS.x + 22} y={steepS.y + 3} textAnchor="start">
           steeper
         </text>
-        <text className="label-pool" x={troughS.x} y={troughS.y + 3} textAnchor="middle">
+        <text
+          className="label-pool"
+          x={pocketOnFill.x}
+          y={pocketOnFill.y - 6}
+          textAnchor="middle"
+          data-pocket-on-fill="true"
+        >
           pocket
         </text>
-        <text className="label" x={apronS.x} y={apronS.y + 3} textAnchor="middle">
+        <text className="label" x={apronS.x} y={apronS.y + 10} textAnchor="middle">
           &lt;1%
         </text>
         <line
           className="ring-tick"
+          data-downhill-tick="true"
           x1={tickInner.x}
           y1={tickInner.y}
           x2={tickOuter.x}
           y2={tickOuter.y}
         />
+        {site.aspectDeg != null && (
+          <text
+            className="downhill-label"
+            x={downhillLabelPt.x}
+            y={downhillLabelPt.y + 3}
+            textAnchor="middle"
+          >
+            downhill
+          </text>
+        )}
         {showGhost && (
           <>
             <circle className="ghost" cx={ghostPt.x} cy={ghostPt.y} r={PIN_R} />
@@ -321,7 +339,7 @@ function PlanHill({
         </text>
         <text className="source-on-graphic" x={24} y={534}>
           10° south vs a flat site: up to {JONES_DUFF_SOUTH_VS_FLAT_INSOLATION_PCT}% more
-          insolation — not south vs north
+          insolation — not south vs north (Jones & Duff 2007)
         </text>
       </svg>
     </section>
@@ -457,7 +475,7 @@ function HillProfile({ site }: { site: SiteState }) {
           vineyards)
         </text>
         <text className="source-on-graphic" x={PROFILE.m.left} y={PROFILE.h - 20}>
-          EM 8973: frost pockets via air drainage / elevation
+          OSU EM 8973 (rev. 2022): frost pockets via air drainage / elevation
         </text>
       </svg>
     </section>

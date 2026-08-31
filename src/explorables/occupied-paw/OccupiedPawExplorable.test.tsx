@@ -25,6 +25,13 @@ describe("OccupiedPawExplorable", () => {
     expect(screen.getAllByRole("button", { name: /Young, 16 inches/i }).length).toBe(
       2,
     );
+    expect(screen.getAllByText(/60 in Established/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/32 in Cr Established/).length).toBeGreaterThan(0);
+    for (const el of document.querySelectorAll(".age-stop")) {
+      expect(Number(el.getAttribute("x"))).toBeLessThan(108);
+    }
+    expect(screen.getByText(/Levin 11\.4 vs 20\.2 \(not NVW\)/)).toBeInTheDocument();
+    expect(screen.getByText(/AgriMet ARAO\/FOGO/)).toBeInTheDocument();
   });
 
   it("has no run or calculate button (A2)", () => {
