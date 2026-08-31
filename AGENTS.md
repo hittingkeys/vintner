@@ -26,9 +26,9 @@ Assume every numeric or causal claim is wrong until sourced. Unverified claims s
 
 ## Definition of done (a component)
 
-No verifier subagent and no design-critic subagent exist. CI and the live preview are the proof. A fresh pass against the rubric is the audit.
+No verifier subagent and no design-critic subagent exist in this repo. CI and the live preview are the proof. After functional verification, the coordinator runs a Design critic **skill** in a fresh pass against the rubric. Do not spawn a `design-critic` subagent.
 
-1. **Spec written.** Answer the five questions in [`docs/explorable-design.md`](docs/explorable-design.md), including three sourced known-answer cases with expected values **and** a stated tolerance.
+1. **Spec written.** Answer the five questions in [`docs/explorable-design.md`](docs/explorable-design.md), including three sourced known-answer cases with expected values **and** a stated tolerance. The spec includes Part F tests.
 2. **Implemented.**
 3. **Verification table complete.** Report only results that were actually run. Green tests plus a broken extreme is incomplete.
 
@@ -40,9 +40,9 @@ No verifier subagent and no design-critic subagent exist. CI and the live previe
    | KNOWN-ANSWER CASES | each case: expected / got / tolerance |
    | EXTREMES | each input at min and at max on the **live** preview |
 
-4. **Design audit of the live interactive.** Manipulate the controls. Screenshots cannot pass A2 or A4. Report no Part D / Part E findings.
+4. **Design audit of the live interactive.** After verification, the coordinator runs the Design critic skill. There is no design-critic subagent and no verifier subagent. Manipulate the controls. Screenshots cannot pass A2 or A4. Report no Part D / Part E / Part F findings.
 
-Never report a result that was not actually run.
+Never report a result that was not actually run. Screenshots cannot pass A2 or A4.
 
 ## Frozen without asking Matt
 
