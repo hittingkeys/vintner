@@ -15,6 +15,7 @@ import {
 import {
   RLC_POCKET_Z_M,
   evaluateSite,
+  frostPocketInnerRM,
   profileHeights,
   wrapBearingDeg,
   xyToPolar,
@@ -31,10 +32,20 @@ const PLAN = {
   ringInner: 154,
   ringOuter: 186,
 };
-const PROFILE = { w: 480, h: 280, m: { top: 28, right: 14, bottom: 72, left: 44 } };
+const PROFILE = { w: 520, h: 280, m: { top: 28, right: 56, bottom: 72, left: 44 } };
 const PIN_R = 7;
 
 function svgPoint(svg: SVGSVGElement, event: PointerEvent): { x: number; y: number } {
+  const rect = svg.getBoundingClientRect();
+  if (rect.width > 0 && rect.height > 0) {
+    const vb = svg.viewBox.baseVal;
+    const vbW = vb?.width || PLAN.w;
+    const vbH = vb?.height || PLAN.h;
+    return {
+      x: ((event.clientX - rect.left) / rect.width) * vbW,
+      y: ((event.clientY - rect.top) / rect.height) * vbH,
+    };
+  }
   const pt = svg.createSVGPoint();
   pt.x = event.clientX;
   pt.y = event.clientY;
@@ -101,6 +112,8 @@ function PlanHill({
     { key: "more-w", cls: "sun-wedge-more", from: 202.5, to: 292.5 },
   ];
 
+  const dragging = useRef(false);
+
   function toPlan(xM: number, yM: number): { x: number; y: number } {
     return { x: cx + xM * scale, y: cy - yM * scale };
   }
@@ -115,14 +128,34 @@ function PlanHill({
     onMove(Math.min(HILL_R_MAX_M, polarPos.rM), polarPos.bearingDeg);
   }
 
-  function onPointerDown(event: React.PointerEvent<SVGElement>) {
-    event.currentTarget.setPointerCapture(event.pointerId);
+  // A2: keep capture on the SVG for the whole gesture, even after leaving .pin-hit.
+  function onPointerDown(event: React.PointerEvent<SVGSVGElement>) {
+    dragging.current = true;
+    const target = event.currentTarget;
+    if (typeof target.setPointerCapture === "function") {
+      target.setPointerCapture(event.pointerId);
+    }
     setFromPointer(event.nativeEvent);
   }
 
-  function onPointerMove(event: React.PointerEvent<SVGElement>) {
-    if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+  function onPointerMove(event: React.PointerEvent<SVGSVGElement>) {
+    const captured =
+      typeof event.currentTarget.hasPointerCapture === "function" &&
+      event.currentTarget.hasPointerCapture(event.pointerId);
+    if (!dragging.current && !captured) return;
     setFromPointer(event.nativeEvent);
+  }
+
+  function onPointerUp(event: React.PointerEvent<SVGSVGElement>) {
+    dragging.current = false;
+    const target = event.currentTarget;
+    if (
+      typeof target.hasPointerCapture === "function" &&
+      typeof target.releasePointerCapture === "function" &&
+      target.hasPointerCapture(event.pointerId)
+    ) {
+      target.releasePointerCapture(event.pointerId);
+    }
   }
 
   const pin = toPlan(site.xM, site.yM);
@@ -130,8 +163,7 @@ function PlanHill({
   const tickBearing = site.aspectDeg ?? site.bearingDeg;
   const tickInner = polar(cx, cy, ringInner - 2, tickBearing);
   const tickOuter = polar(cx, cy, ringOuter + 6, tickBearing);
-  const troughInner = 64 * scale;
-  const troughOuter = 96 * scale;
+  const pocketInnerPx = frostPocketInnerRM() * scale;
   const midS = toPlan(0, -FIXTURE_R.midSlope);
   const troughS = toPlan(0, -FIXTURE_R.trough);
   const apronS = toPlan(0, -110);
@@ -140,21 +172,41 @@ function PlanHill({
   const labelS = polar(cx, cy, ringMid, 180);
   const labelE = polar(cx, cy, ringMid, 110);
   const labelW = polar(cx, cy, ringMid, 250);
-  const pinLabelSide = site.xM >= 0 ? -1 : 1;
-  const pinLabelX = pin.x + pinLabelSide * 16;
-  const pinLabelAnchor = pinLabelSide < 0 ? "end" : "start";
+  // F6: offset pin copy off the south contour labels ("5–15%", "pocket").
+  const pinLabelEast = site.xM >= -8;
+  const pinLabelX = pin.x + (pinLabelEast ? 28 : -28);
+  const pinLabelAnchor = pinLabelEast ? "start" : "end";
+  const pinLabelY = pin.y - 18;
 
   return (
     <section className="same-hill-plan" aria-label="Hill plan with solar-rank ring">
       <svg
         ref={svgRef}
+        className="pin-hit"
         viewBox={`0 0 ${PLAN.w} ${PLAN.h}`}
         role="img"
         aria-label="Schematic hill with aspect ring. Drag the pin. Solar class is labeled on the ring; slope bands and the trough are labeled on the hill."
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
         <circle className="hill-fill" cx={cx} cy={cy} r={PLAN.hillPx} />
-        <circle className="trough-fill" cx={cx} cy={cy} r={troughOuter} />
-        <circle className="hill-fill" cx={cx} cy={cy} r={troughInner} />
+        {/* A6 / F9: frost fill for every r with rlc < 0.4, through the apron. */}
+        <circle
+          className="trough-fill"
+          data-frost-region="true"
+          cx={cx}
+          cy={cy}
+          r={PLAN.hillPx}
+        />
+        <circle
+          className="hill-fill"
+          data-frost-inner="true"
+          cx={cx}
+          cy={cy}
+          r={pocketInnerPx}
+        />
         {[8, 20, 36, 48, 84, 110].map((r) => (
           <circle key={r} className="contour" cx={cx} cy={cy} r={r * scale} />
         ))}
@@ -239,19 +291,11 @@ function PlanHill({
             </text>
           </>
         )}
-        <circle
-          className="pin-hit"
-          cx={cx}
-          cy={cy}
-          r={ringOuter}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-        />
         <circle className="pin" cx={pin.x} cy={pin.y} r={PIN_R} />
         <text
           className="pin-label"
           x={pinLabelX}
-          y={pin.y - 10}
+          y={pinLabelY}
           textAnchor={pinLabelAnchor}
         >
           facing {site.facing}
@@ -259,7 +303,7 @@ function PlanHill({
         <text
           className="pin-label"
           x={pinLabelX}
-          y={pin.y + 4}
+          y={pinLabelY + 12}
           textAnchor={pinLabelAnchor}
         >
           {site.slopeBandLabel}
@@ -267,13 +311,13 @@ function PlanHill({
         <text
           className="pin-label"
           x={pinLabelX}
-          y={pin.y + 18}
+          y={pinLabelY + 24}
           textAnchor={pinLabelAnchor}
         >
           solar {site.solarClass === 2 ? "highest" : site.solarClass === 1 ? "more" : site.solarClass === 0 ? "less" : "unranked"}
         </text>
         <text className="source-on-graphic" x={24} y={518}>
-          Jones Umpqua GIS (reused Rogue) — ordinal rank, not Willamette W/m²
+          Jones et al. 2004 Umpqua GIS (reused Rogue) — ordinal rank, not Willamette W/m²
         </text>
         <text className="source-on-graphic" x={24} y={534}>
           10° south vs a flat site: up to {JONES_DUFF_SOUTH_VS_FLAT_INSOLATION_PCT}% more
@@ -335,9 +379,19 @@ function HillProfile({ site }: { site: SiteState }) {
       .join(" ");
   }, [diameter, x, y]);
 
-  const pinS = site.rM;
+  const pinS = Math.min(site.rM, HILL_R_MAX_M);
   const midGhost = evaluateSite(FIXTURE_R.midSlope, site.bearingDeg);
   const inPocket = site.frostClass === 1;
+  const plotLeft = PROFILE.m.left;
+  const plotRight = PROFILE.w - PROFILE.m.right;
+  const pinX = Math.min(plotRight - PIN_R, Math.max(plotLeft + PIN_R, x(pinS)));
+  const pinY = y(site.zM);
+  const frostCaption = `frost ${site.frostClassLabel}${
+    inPocket ? ` · ${PENNER_ASH_FROST_HOURS_PCT}% of hours` : ""
+  }`;
+  const labelOnLeft = pinX > (plotLeft + plotRight) / 2;
+  const labelX = labelOnLeft ? pinX - 10 : pinX + 10;
+  const labelAnchor = labelOnLeft ? "end" : "start";
 
   return (
     <section className="same-hill-profile" aria-label="Hill profile with cold-air pool">
@@ -361,7 +415,7 @@ function HillProfile({ site }: { site: SiteState }) {
           cy={y(midGhost.zM)}
           r={PIN_R}
         />
-        <circle className="pin" cx={x(pinS)} cy={y(site.zM)} r={PIN_R} />
+        <circle className="pin" cx={pinX} cy={pinY} r={PIN_R} />
         <text
           className="label-pool"
           x={x(FIXTURE_R.trough)}
@@ -380,11 +434,11 @@ function HillProfile({ site }: { site: SiteState }) {
         </text>
         <text
           className="pin-label"
-          x={x(pinS) + 10}
-          y={y(site.zM) + 4}
+          x={labelX}
+          y={pinY + 4}
+          textAnchor={labelAnchor}
         >
-          frost {site.frostClassLabel}
-          {inPocket ? ` · ${PENNER_ASH_FROST_HOURS_PCT}% of hours` : ""}
+          {frostCaption}
         </text>
         <text className="label" x={x(0)} y={y(16.2) - 4} textAnchor="middle">
           ridge

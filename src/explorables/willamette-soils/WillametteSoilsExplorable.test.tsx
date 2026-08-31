@@ -16,9 +16,10 @@ describe("WillametteSoilsExplorable", () => {
 
   it("has a shared depth control and no run button (A2, A4)", () => {
     render(<WillametteSoilsExplorable />);
-    expect(
-      screen.getByLabelText(/depth in all three pits/i),
-    ).toBeInTheDocument();
+    const slider = screen.getByLabelText(/depth in all three pits/i);
+    expect(slider).toBeInTheDocument();
+    expect(slider).toHaveClass("visually-hidden");
+    expect(document.querySelector(".depth-line")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /^run$/i })).not.toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: /calculate/i }),
@@ -133,7 +134,11 @@ describe("WillametteSoilsExplorable", () => {
       screen.getAllByText(/SoilWeb generalized SSURGO/i).length,
     ).toBeGreaterThan(0);
     expect(screen.getByText(/Basemap: Esri World Topo/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/NAD27/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/NAD27/i)).toHaveLength(1);
+    expect(screen.getByText(/snapshot 2025-10-04/)).toBeInTheDocument();
+    expect(document.querySelector(".extent-legend")).toBeNull();
+    expect(document.querySelectorAll(".type-pin-name")).toHaveLength(3);
+    expect(document.querySelector('.type-pin-name')?.textContent).toMatch(/Jory|Willakenzie|Laurelwood/);
     expect(screen.queryByText(/CARTO/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Positron/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/OpenStreetMap \(CARTO/i)).not.toBeInTheDocument();

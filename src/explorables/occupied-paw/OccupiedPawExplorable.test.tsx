@@ -10,6 +10,21 @@ describe("OccupiedPawExplorable", () => {
     expect(screen.getAllByText(/occupied TAW 15 cm/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/25–41 cm/i)).toBeInTheDocument();
     expect(screen.getByText(/shared demand/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/0\.0 in \(0 cm\)/).length).toBeGreaterThan(0);
+    expect(document.querySelector(".legend")).toBeNull();
+    expect(document.querySelector(".jory-on-line")?.textContent).toMatch(/Jory/);
+    expect(document.querySelector(".will-on-line")?.textContent).toMatch(
+      /Willakenzie/,
+    );
+    expect(document.querySelector(".drip-on-line")?.textContent).toMatch(
+      /drip floor/,
+    );
+    expect(screen.getByText(/SoilWeb SSURGO PAWS/)).toBeInTheDocument();
+    expect(screen.getByText(/USW00094273/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /young preset/i })).toBeNull();
+    expect(screen.getAllByRole("button", { name: /Young, 16 inches/i }).length).toBe(
+      2,
+    );
   });
 
   it("has no run or calculate button (A2)", () => {
@@ -32,5 +47,9 @@ describe("OccupiedPawExplorable", () => {
     expect(
       screen.getByLabelText(/seasonal demand on both blocks/i),
     ).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /deficit drip/i }).length).toBe(
+      2,
+    );
+    expect(document.querySelectorAll(".age-ghost")).toHaveLength(2);
   });
 });

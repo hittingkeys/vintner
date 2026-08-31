@@ -25,16 +25,18 @@ describe("occupied-paw ExplorableSpec", () => {
 });
 
 describe("occupied-root-zone lesson frontmatter", () => {
-  it("matches LessonFrontmatter and carries the comparison prompt", () => {
+  it("matches LessonFrontmatter and carries the split retrieval prompts", () => {
     const lesson = frontmatter as unknown as LessonFrontmatter;
     expect(lesson.id).toBe("occupied-root-zone");
     expect(lesson.governingPart).toMatch(/^(A|B|both)$/);
     expect(lesson.misconception).toMatch(/dry-farm/i);
     expect(lesson.coupledVariables.length).toBeGreaterThanOrEqual(3);
     expect(lesson.citations.length).toBeGreaterThan(5);
-    expect(lesson.prompts).toHaveLength(1);
+    expect(lesson.prompts).toHaveLength(2);
     expect(lesson.prompts?.[0]?.kind).toBe("comparison");
-    expect(lesson.prompts?.[0]?.kind).not.toBe("definition");
+    expect(lesson.prompts?.[1]?.kind).toBe("cause");
+    expect(lesson.prompts?.every((p) => p.kind !== "definition")).toBe(true);
     expect(lesson.prompts?.[0]?.answerKey).toMatch(/15 cm/);
+    expect(lesson.prompts?.[1]?.answerKey).toMatch(/paralithic|Cr/i);
   });
 });

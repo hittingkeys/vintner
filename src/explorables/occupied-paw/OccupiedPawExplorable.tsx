@@ -23,11 +23,10 @@ import {
   cmToIn,
   inToCm,
 } from "./constants";
-import { formatCm, formatDemandIn, formatInchesSourced, formatInchesWhole } from "./format";
+import { formatCm, formatDemandPair, formatInchesSourced, formatInchesWhole } from "./format";
 import {
   JORY_PROFILE,
   WILLAKENZIE_PROFILE,
-  occupiedTawCm,
   simulate,
   type SeriesProfile,
   type SimulateResult,
@@ -37,6 +36,12 @@ import "./occupied-paw.css";
 interface BlockState {
   occupiedDepthCm: number;
   deficitDrip: boolean;
+}
+
+function otherPresetDepthCm(currentCm: number, establishedCm: number): number {
+  return Math.abs(currentCm - YOUNG_PRESET_CM) <= Math.abs(currentCm - establishedCm)
+    ? establishedCm
+    : YOUNG_PRESET_CM;
 }
 
 function fate(result: SimulateResult): { kind: "ok" | "thirst" | "stall"; text: string } {
@@ -336,6 +341,62 @@ function ProfilePit({
             </text>
           </g>
         ))}
+        {/* A4: Young / Established as labeled stops on the pit depth axis. */}
+        {(
+          [
+            { cm: YOUNG_PRESET_CM, label: "Young", inches: 16 },
+            {
+              cm: establishedCm,
+              label: "Established",
+              inches: Math.round(cmToIn(establishedCm)),
+            },
+          ] as const
+        ).map((stop) => {
+          const pressed = Math.abs(occupiedDepthCm - stop.cm) < 0.5;
+          return (
+            <text
+              key={stop.label}
+              className="age-stop"
+              role="button"
+              tabIndex={0}
+              aria-pressed={pressed}
+              aria-label={`${stop.label}, ${stop.inches} inches`}
+              x={colX + colW + 16}
+              y={y(stop.cm) + 3}
+              data-pressed={pressed ? "true" : "false"}
+              onClick={() => onDepth(stop.cm)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onDepth(stop.cm);
+                }
+              }}
+            >
+              {stop.label}
+            </text>
+          );
+        })}
+        {/* A4: drip toggle on the water column / RAW line, not a button row. */}
+        <text
+          className="drip-toggle"
+          role="button"
+          tabIndex={0}
+          aria-pressed={drip}
+          aria-label="Deficit drip"
+          x={colX + colW / 2}
+          y={taw > 0 ? rawY + 12 : surface + 36}
+          textAnchor="middle"
+          data-pressed={drip ? "true" : "false"}
+          onClick={() => onDrip(!drip)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              onDrip(!drip);
+            }
+          }}
+        >
+          {drip ? "drip on" : "drip"}
+        </text>
       </svg>
       <p className="pit-metrics">
         <strong>occupied TAW {formatCm(result.occupiedTawCm)}</strong>
@@ -343,7 +404,7 @@ function ProfilePit({
           <span className="band-note">
             {" "}
             · default MU {formatCm(JORY_PAWS_RANGE_CM.min)} · range{" "}
-            {formatCm(JORY_PAWS_RANGE_CM.min)}–{formatCm(JORY_PAWS_RANGE_CM.max)}{" "}
+            {JORY_PAWS_RANGE_CM.min}–{JORY_PAWS_RANGE_CM.max} cm{" "}
             · other MUs {JORY_OTHER_MU_PAWS_CM.map((n) => `${n}`).join(", ")} cm
           </span>
         )}
@@ -368,29 +429,16 @@ function ProfilePit({
         value={occupiedDepthCm}
         onChange={(e) => onDepth(Number(e.target.value))}
       />
-      <div className="pit-controls">
-        <button
-          type="button"
-          aria-pressed={occupiedDepthCm <= YOUNG_PRESET_CM + 0.5}
-          onClick={() => onDepth(YOUNG_PRESET_CM)}
-        >
-          Young preset
-        </button>
-        <button
-          type="button"
-          aria-pressed={Math.abs(occupiedDepthCm - establishedCm) < 0.5}
-          onClick={() => onDepth(establishedCm)}
-        >
-          Established
-        </button>
-        <button
-          type="button"
-          aria-pressed={drip}
-          onClick={() => onDrip(!drip)}
-        >
-          Deficit drip
-        </button>
-      </div>
+      <label className="visually-hidden" htmlFor={`${series.id}-drip`}>
+        {series.name} deficit drip
+      </label>
+      <input
+        id={`${series.id}-drip`}
+        className="visually-hidden"
+        type="checkbox"
+        checked={drip}
+        onChange={(e) => onDrip(e.target.checked)}
+      />
       <p className="young-caption">
         Young preset {formatCm(YOUNG_PRESET_CM)} is TODO:UNVERIFIED year-1
         extractable depth — not a FAO Zr midpoint. Drag the roots. Years 1–3
@@ -422,8 +470,8 @@ function DemandResponse({
   const svgRef = useRef<SVGSVGElement>(null);
   const demandId = useId();
   const width = 720;
-  const height = 260;
-  const m = { top: 16, right: 16, bottom: 56, left: 44 };
+  const height = 292;
+  const m = { top: 16, right: 16, bottom: 78, left: 44 };
   const x = d3
     .scaleLinear()
     .domain([0, DEMAND_AXIS_MAX_IN])
@@ -437,6 +485,11 @@ function DemandResponse({
     const n = 80;
     return d3.range(n + 1).map((i) => (i / n) * DEMAND_AXIS_MAX_IN);
   }, []);
+
+  const joryEstablishedCm = JORY_PAWS_REFERENCE_CM;
+  const willEstablishedCm = WILLAKENZIE_CR_CM;
+  const joryOtherDepth = otherPresetDepthCm(joryDepth, joryEstablishedCm);
+  const willOtherDepth = otherPresetDepthCm(willDepth, willEstablishedCm);
 
   const joryLow = samples.map((d) => ({
     d,
@@ -494,6 +547,25 @@ function DemandResponse({
       deficitDrip: true,
     }).remainingPawCm,
   }));
+  // A3 / F5: ghost the other age preset so Young ↔ Established does not overwrite.
+  const joryAgeGhost = samples.map((d) => ({
+    d,
+    r: simulate({
+      series: JORY_PROFILE,
+      occupiedDepthCm: joryOtherDepth,
+      demandCm: inToCm(d),
+      deficitDrip: joryDrip,
+    }).remainingPawCm,
+  }));
+  const willAgeGhost = samples.map((d) => ({
+    d,
+    r: simulate({
+      series: WILLAKENZIE_PROFILE,
+      occupiedDepthCm: willOtherDepth,
+      demandCm: inToCm(d),
+      deficitDrip: willDrip,
+    }).remainingPawCm,
+  }));
 
   const line = d3
     .line<{ d: number; r: number }>()
@@ -510,12 +582,17 @@ function DemandResponse({
     high: joryHigh[i].r,
   }));
 
-  const anchors: { inches: number; label: string; decimals: number }[] = [
-    { inches: MCMINNVILLE_JUN_SEP_P_IN, label: "P 3.23", decimals: 2 },
-    { inches: AGRIMET_ETC_GRAPE_IN.a, label: "grape 18.3", decimals: 1 },
-    { inches: AGRIMET_ETC_GRAPE_IN.b, label: "19.6", decimals: 1 },
-    { inches: AGRIMET_ETR_ARAO_JUNSEP_IN, label: "ETr 24.02", decimals: 2 },
-    { inches: AGRIMET_ETR_FOGO_JUNSEP_IN, label: "25.61", decimals: 2 },
+  const grapeDemandCm = formatCm(inToCm(AGRIMET_ETC_GRAPE_IN.a));
+  const anchors: { inches: number; label: string; extra?: string }[] = [
+    { inches: MCMINNVILLE_JUN_SEP_P_IN, label: "P 3.23" },
+    {
+      inches: AGRIMET_ETC_GRAPE_IN.a,
+      label: "grape 18.3",
+      extra: grapeDemandCm,
+    },
+    { inches: AGRIMET_ETC_GRAPE_IN.b, label: "19.6" },
+    { inches: AGRIMET_ETR_ARAO_JUNSEP_IN, label: "ETr 24.02" },
+    { inches: AGRIMET_ETR_FOGO_JUNSEP_IN, label: "25.61" },
   ];
 
   function setFromPointer(event: PointerEvent) {
@@ -535,14 +612,15 @@ function DemandResponse({
     setFromPointer(event.nativeEvent);
   }
 
-  const joryTawNow = occupiedTawCm(JORY_PROFILE, joryDepth);
-  const willTawNow = occupiedTawCm(WILLAKENZIE_PROFILE, willDepth);
+  const joryAtZero = joryLine[0]?.r ?? 0;
+  const willAtZero = willLine[0]?.r ?? 0;
+  const dripAtZero = joryGhost[0]?.r ?? 0;
 
   return (
     <section className="response" aria-label="Remaining occupied PAW versus shared demand">
       <h3 className="response-title">
         Remaining occupied PAW vs the same seasonal demand — current{" "}
-        {formatDemandIn(demandIn)}
+        {formatDemandPair(demandIn)}
       </h3>
       <svg
         ref={svgRef}
@@ -586,14 +664,34 @@ function DemandResponse({
             <text
               className="label"
               x={x(a.inches)}
-              y={height - m.bottom + 28}
+              y={height - m.bottom + 22}
               textAnchor="middle"
             >
               {a.label}
             </text>
+            {a.extra ? (
+              <text
+                className="label"
+                x={x(a.inches)}
+                y={height - m.bottom + 34}
+                textAnchor="middle"
+              >
+                {a.extra}
+              </text>
+            ) : null}
           </g>
         ))}
         <path className="band" d={area(band) ?? undefined} />
+        <path
+          className="age-ghost"
+          stroke="#3d6b4f"
+          d={line(joryAgeGhost) ?? undefined}
+        />
+        <path
+          className="age-ghost"
+          stroke="#8a4b2f"
+          d={line(willAgeGhost) ?? undefined}
+        />
         <path
           className="ghost"
           stroke="#3d6b4f"
@@ -606,6 +704,16 @@ function DemandResponse({
         />
         <path className="jory-line" d={line(joryLine) ?? undefined} />
         <path className="will-line" d={line(willLine) ?? undefined} />
+        {/* F8: series name on the series at demand=0; no legend. */}
+        <text className="series-label jory-on-line" x={m.left + 6} y={y(joryAtZero) - 4}>
+          Jory
+        </text>
+        <text className="series-label will-on-line" x={m.left + 6} y={y(willAtZero) + 11}>
+          Willakenzie
+        </text>
+        <text className="series-label drip-on-line" x={m.left + 72} y={y(dripAtZero) + 3}>
+          drip floor
+        </text>
         <line
           className="demand-line"
           x1={x(demandIn)}
@@ -643,7 +751,7 @@ function DemandResponse({
           y1={m.top}
           y2={height - m.bottom}
         />
-        <text className="label" x={(m.left + width - m.right) / 2} y={height - 8} textAnchor="middle">
+        <text className="label" x={(m.left + width - m.right) / 2} y={height - 22} textAnchor="middle">
           seasonal demand (in) — same weather on both blocks
         </text>
         <text
@@ -653,6 +761,10 @@ function DemandResponse({
           transform={`rotate(-90 14 ${m.top + 70})`}
         >
           remaining occupied PAW (cm)
+        </text>
+        <text className="source-on-graphic" x={m.left} y={height - 8}>
+          SoilWeb SSURGO PAWS; OSD Jory 2011 / Willakenzie 2006; NOAA NCEI
+          1991–2020 Jun–Sep USW00094273.
         </text>
       </svg>
       <label className="visually-hidden" htmlFor={demandId}>
@@ -668,19 +780,6 @@ function DemandResponse({
         value={demandIn}
         onChange={(e) => onDemand(Number(e.target.value))}
       />
-      <p className="legend">
-        <span className="jory">
-          <i />
-          Jory now {formatCm(jory.remainingPawCm)} (TAW {formatCm(joryTawNow)})
-        </span>
-        <span className="ribbon">
-          <i />
-          Willakenzie now {formatCm(will.remainingPawCm)} (TAW{" "}
-          {formatCm(willTawNow)})
-        </span>
-        <span>band = Jory PAWS 25–41 cm at this occupied depth</span>
-        <span>dashed = deficit-drip ghost (floor at (1 − 0.45) × TAW)</span>
-      </p>
     </section>
   );
 }
@@ -713,7 +812,7 @@ export function OccupiedPawExplorable() {
   return (
     <div className="occupied-paw">
       <p className="pit-metrics">
-        <strong>Shared demand {formatDemandIn(demandIn)}</strong>
+        <strong>Shared demand {formatDemandPair(demandIn)}</strong>
         {" · "}
         McMinnville Jun–Sep P {formatInchesSourced(MCMINNVILLE_JUN_SEP_P_IN, 2)}{" "}
         (rain, not leftover mm)

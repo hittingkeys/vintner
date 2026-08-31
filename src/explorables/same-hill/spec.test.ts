@@ -40,17 +40,20 @@ describe("same-hill ExplorableSpec", () => {
 });
 
 describe("same-hill lesson frontmatter", () => {
-  it("matches LessonFrontmatter and carries one non-definition prompt", () => {
+  it("matches LessonFrontmatter and carries two non-definition prompts", () => {
     const lesson = frontmatter as unknown as LessonFrontmatter;
     expect(lesson.id).toBe("same-hill");
     expect(lesson.governingPart).toMatch(/^(A|B|both)$/);
     expect(lesson.misconception).toMatch(/south-facing/i);
     expect(lesson.coupledVariables.length).toBeGreaterThanOrEqual(3);
     expect(lesson.citations.length).toBeGreaterThan(3);
-    expect(lesson.prompts).toHaveLength(1);
+    expect(lesson.prompts).toHaveLength(2);
     expect(lesson.prompts?.[0]?.kind).toMatch(/^(prediction|cause)$/);
-    expect(lesson.prompts?.[0]?.kind).not.toBe("definition");
+    expect(lesson.prompts?.[1]?.kind).toMatch(/^(prediction|cause)$/);
+    expect(lesson.prompts?.every((p) => p.kind !== "definition")).toBe(true);
     expect(lesson.prompts?.[0]?.answerKey).toMatch(/trough|air drainage|RLC/i);
+    expect(lesson.prompts?.[1]?.answerKey).toMatch(/lowness|aspect/i);
     expect(lesson.prompts?.[0]?.sources.length).toBeGreaterThan(0);
+    expect(lesson.prompts?.[1]?.sources.length).toBeGreaterThan(0);
   });
 });

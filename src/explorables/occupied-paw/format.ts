@@ -1,5 +1,7 @@
 /** Round to the precision agronomy supports. Do not render faux-precision. */
 
+import { inToCm } from "./constants";
+
 export function roundCm(cm: number): number {
   return Math.round(cm);
 }
@@ -18,4 +20,9 @@ export function formatInchesSourced(inches: number, decimals: number): string {
 
 export function formatDemandIn(inches: number): string {
   return `${inches.toFixed(1)} in`;
+}
+
+/** A1: same demand in inches and centimetres (existing inToCm). */
+export function formatDemandPair(inches: number): string {
+  return `${formatDemandIn(inches)} (${formatCm(inToCm(inches))})`;
 }

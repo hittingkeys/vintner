@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { vi } from "vitest";
 import { SameHillExplorable } from "./SameHillExplorable";
 import { PENNER_ASH_FROST_HOURS_PCT } from "./constants";
 
@@ -38,6 +39,46 @@ describe("SameHillExplorable", () => {
     expect(screen.queryByRole("button", { name: /^play$/i })).not.toBeInTheDocument();
   });
 
+  it("pointer-move with capture updates r/bearing (A2)", () => {
+    render(<SameHillExplorable />);
+    const svg = document.querySelector(".same-hill-plan svg") as SVGSVGElement;
+    vi.spyOn(svg, "getBoundingClientRect").mockReturnValue({
+      x: 0,
+      y: 0,
+      left: 0,
+      top: 0,
+      right: 480,
+      bottom: 560,
+      width: 480,
+      height: 560,
+      toJSON() {
+        return {};
+      },
+    } as DOMRect);
+    const radius = screen.getByLabelText(
+      /distance from ridge/i,
+    ) as HTMLInputElement;
+    fireEvent.pointerDown(svg, { pointerId: 1, clientX: 240, clientY: 248 });
+    expect(Number(radius.value)).toBeLessThan(15);
+    fireEvent.pointerMove(svg, {
+      pointerId: 1,
+      clientX: 240,
+      clientY: 337,
+      buttons: 1,
+    });
+    expect(Number(radius.value)).toBeGreaterThan(50);
+    expect(screen.getByTestId("frost-class")).toHaveTextContent(/pocket/i);
+  });
+
+  it("keeps the 81% frost caption readable at rMax (A6)", () => {
+    render(<SameHillExplorable />);
+    fireEvent.change(screen.getByLabelText(/distance from ridge/i), {
+      target: { value: "130" },
+    });
+    expect(screen.getByTestId("frost-class")).toHaveTextContent(/pocket/i);
+    expect(screen.getByText(/frost pocket · 81% of hours/)).toBeInTheDocument();
+  });
+
   it("exposes pin position on the hill (A4)", () => {
     render(<SameHillExplorable />);
     expect(
@@ -74,12 +115,20 @@ describe("SameHillExplorable", () => {
     expect(screen.getByTestId("solar-class")).toHaveTextContent(/less/i);
   });
 
-  it("flat apron is the <1% slope band", () => {
+  it("flat apron is the <1% slope band and is in the frost fill (A6 / F9)", () => {
     render(<SameHillExplorable />);
     fireEvent.change(screen.getByLabelText(/distance from ridge/i), {
       target: { value: "110" },
     });
     expect(screen.getByTestId("slope-band")).toHaveTextContent("<1%");
+    expect(screen.getByTestId("frost-class")).toHaveTextContent(/pocket/i);
+    const frost = document.querySelector("[data-frost-region]");
+    const inner = document.querySelector("[data-frost-inner]");
+    const hill = document.querySelector(".hill-fill");
+    expect(frost?.getAttribute("r")).toBe(hill?.getAttribute("r"));
+    expect(Number(inner?.getAttribute("r"))).toBeLessThan(
+      Number(frost?.getAttribute("r")),
+    );
   });
 
   it("10° south caption is vs a flat site, not vs north (F11)", () => {
@@ -109,6 +158,7 @@ describe("SameHillExplorable", () => {
 
   it("keeps Jones, Penner-Ash, and EM 8973 on the canvas (F11)", () => {
     render(<SameHillExplorable />);
+    expect(screen.getByText(/Jones et al. 2004/i)).toBeInTheDocument();
     expect(screen.getByText(/Umpqua GIS/i)).toBeInTheDocument();
     expect(screen.getByText(/Penner-Ash 2014/i)).toBeInTheDocument();
     expect(screen.getByText(/n\. WV/i)).toBeInTheDocument();

@@ -37,9 +37,17 @@ citations:
     year: 2021
     url: https://extension.oregonstate.edu/news/study-shows-southern-oregon-wine-grape-growers-can-save-nearly-half-their-irrigation-water
 prompts:
-  - retrievable: Same typical-year demand, established vines, no irrigation. Which block is more depleted at the end of a dry summer — Jory or Willakenzie — and what in the profile causes that difference?
+  - retrievable: Same typical-year demand, established vines, no irrigation. Which block is more depleted at the end of a dry summer — Jory or Willakenzie?
     kind: comparison
-    answerKey: "Willakenzie is more depleted. Occupied TAW is 15 cm versus 25 cm on the default Jory map unit (Jory range 25–41 cm across MUs) because a paralithic contact (Cr, typical pedon 32 in, series 20–40 in) caps the Willakenzie column; Jory is unrestricted below 60 in. Both series are well drained with moderately slow permeability (OSD). The difference is not drainage speed and not a dry-farm identity."
+    answerKey: "Willakenzie is more depleted. Occupied TAW is 15 cm versus 25 cm on the default Jory map unit (Jory range 25–41 cm across MUs)."
+    sources:
+      - source: SoilWeb SSURGO PAWS, mukeys 2711396, 85310, 62429 and or637 62713–15
+        year: 2011
+      - source: NRCS OSD JORY (06/2011) and WILLAKENZIE (08/2006)
+        year: 2011
+  - retrievable: What in the Willakenzie profile causes that difference in occupied TAW — a Cr cap, or drainage class?
+    kind: cause
+    answerKey: "A paralithic contact (Cr, typical pedon 32 in, series 20–40 in) caps the Willakenzie column, so occupied TAW is 15 cm; Jory is unrestricted below 60 in (default MU 25 cm). Both series are well drained with moderately slow permeability (OSD). The difference is not drainage speed and not a dry-farm identity."
     sources:
       - source: SoilWeb SSURGO PAWS, mukeys 2711396, 85310, 62429 and or637 62713–15
         year: 2011
@@ -59,9 +67,11 @@ Jory and Willakenzie are both well drained, both moderately slow permeability. T
 
 </div>
 
-<RetrievalPrompt />
-
 <OccupiedPaw />
+
+<RetrievalPrompt index={0} />
+
+<RetrievalPrompt index={1} />
 
 <div className="lesson-prose citations">
 

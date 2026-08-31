@@ -24,9 +24,19 @@ citations:
     year: 2024
     url: https://extension.oregonstate.edu/catalog/pnw-634-considerations-resources-vineyard-establishment-inland-pacific-northwest
 prompts:
-  - retrievable: Two blocks on the same hill — one on the south mid-slope, one in the trough. Which concentrates frost hours, and why?
+  - retrievable: Two blocks on the same hill — one on the south mid-slope, one in the trough. Which concentrates frost hours?
+    kind: prediction
+    answerKey: "The trough. Penner-Ash & Pogue (2014): 24 loggers in 12 northern Willamette vineyards; sites with RLC < 0.4 accounted for 81% of frost hours. OSU EM 8973 (Skinkis, rev. 2022): elevation and air drainage to avoid frost and freeze pockets."
+    sources:
+      - source: Penner-Ash, C. and Pogue, K.R. GSA Abstracts with Programs 46(6):464
+        year: 2014
+        url: https://gsa.confex.com/gsa/2014AM/webprogram/Paper244618.html
+      - source: Skinkis. OSU EM 8973 (rev. 2022) — elevation and air drainage to avoid frost and freeze pockets
+        year: 2022
+        url: https://extension.oregonstate.edu/catalog/em-8973-establishing-vineyard-oregon-quick-start-resource-guide
+  - retrievable: Does that frost concentration follow from aspect (south vs north) or from relative lowness?
     kind: cause
-    answerKey: "The trough. Frost hours follow air drainage and relative lowness, not aspect. Penner-Ash & Pogue (2014): 24 loggers in 12 northern Willamette vineyards; no air-temperature–aspect correlation; sites with RLC < 0.4 accounted for 81% of frost hours. OSU EM 8973 (Skinkis, rev. 2022): elevation and air drainage to avoid frost and freeze pockets. A south mid-slope can rank highest for solar receipt (Jones SSE–SSW) and still not be the frost pocket."
+    answerKey: "Relative lowness, not aspect. Penner-Ash & Pogue (2014): no air-temperature–aspect correlation; RLC < 0.4 accounted for 81% of frost hours. OSU EM 8973 (Skinkis, rev. 2022): elevation and air drainage to avoid frost and freeze pockets. A south mid-slope can rank highest for solar receipt (Jones SSE–SSW) and still not be the frost pocket."
     sources:
       - source: Penner-Ash, C. and Pogue, K.R. GSA Abstracts with Programs 46(6):464
         year: 2014
@@ -48,7 +58,9 @@ Drag the pin. The ring around the hill is solar class by facing — SSE–SSW ra
 
 <SameHill />
 
-<RetrievalPrompt />
+<RetrievalPrompt index={0} />
+
+<RetrievalPrompt index={1} />
 
 <div className="lesson-prose citations">
 

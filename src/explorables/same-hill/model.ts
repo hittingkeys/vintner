@@ -256,6 +256,16 @@ export function evaluateXY(xM: number, yM: number): SiteState {
   return evaluateSite(rM, bearingDeg);
 }
 
+/** Inner radius where rlc first drops below 0.4 (pocket through the apron). */
+export function frostPocketInnerRM(): number {
+  const n = 400;
+  for (let i = 0; i <= n; i++) {
+    const rM = (i / n) * HILL_R_MAX_M;
+    if (rlcAtHeight(heightAtRadius(rM)) < RLC_POCKET_THRESHOLD) return rM;
+  }
+  return HILL_R_MAX_M;
+}
+
 export function profileHeights(sampleCount = 80): { rM: number; zM: number }[] {
   const n = Math.max(2, sampleCount);
   return Array.from({ length: n }, (_, i) => {

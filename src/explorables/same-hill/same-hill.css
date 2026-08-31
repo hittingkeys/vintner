@@ -98,16 +98,23 @@
   stroke-width: 2;
 }
 
+.same-hill-plan svg.pin-hit {
+  cursor: grab;
+  touch-action: none;
+}
+
 .same-hill .pin {
   fill: var(--ink);
   stroke: #fffdf8;
   stroke-width: 2;
-  cursor: grab;
+  pointer-events: none;
 }
 
-.same-hill .pin-hit {
-  fill: transparent;
-  cursor: grab;
+.same-hill .pin-label {
+  fill: var(--ink);
+  font-size: 10px;
+  font-weight: 650;
+  pointer-events: none;
 }
 
 .same-hill .ghost {
@@ -137,12 +144,6 @@
 
 .same-hill .label-pool {
   fill: var(--pool);
-  font-size: 10px;
-  font-weight: 650;
-}
-
-.same-hill .pin-label {
-  fill: var(--ink);
   font-size: 10px;
   font-weight: 650;
 }
