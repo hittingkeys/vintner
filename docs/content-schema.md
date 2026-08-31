@@ -2,7 +2,7 @@
 
 **Frozen.** Do not change these schemas without asking Matt. Types live in `src/schemas/`. This file is the human-readable contract.
 
-Lessons live in `content/` as MDX with `LessonFrontmatter`. The landing lesson is `willamette-soils.mdx`. `occupied-root-zone.mdx` remains at `#/occupied-root-zone`. `content/_scaffold.mdx` remains a non-lesson compile stub.
+Lessons live in `content/` as MDX with `LessonFrontmatter`. The landing lesson is `willamette-soils.mdx` (`#/` / `willamette-soils`). `occupied-root-zone.mdx` remains at `#/occupied-root-zone`. `same-hill.mdx` is at `#/same-hill`. `content/_scaffold.mdx` remains a non-lesson compile stub.
 
 ## Lesson MDX (`content/`)
 

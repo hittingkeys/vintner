@@ -1,0 +1,224 @@
+.same-hill {
+  --ink: #1a1a1a;
+  --muted: #5c574e;
+  --rule: #c9c1b2;
+  --paper: #f4f1ea;
+  --board: #fffdf8;
+  --highest: #c47a2c;
+  --more: #d4a574;
+  --less: #7a8aa0;
+  --pool: #3d5c78;
+  --hill: #c4a574;
+  --trough: #8aa0b4;
+  color: var(--ink);
+  margin: 1.5rem 0 2rem;
+}
+
+.same-hill * {
+  box-sizing: border-box;
+}
+
+.same-hill-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 0.75rem 1.25rem;
+  background: var(--board);
+  border: 1px solid var(--rule);
+  padding: 0.75rem;
+}
+
+.same-hill-state {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.same-hill-state dt {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.same-hill-state dd {
+  margin: 0.1rem 0 0;
+  font-weight: 650;
+}
+
+.same-hill-state [data-frost="pocket"] dd {
+  color: var(--pool);
+}
+
+.same-hill-state [data-solar="highest"] dd {
+  color: var(--highest);
+}
+
+.same-hill-plan,
+.same-hill-profile {
+  min-width: 0;
+}
+
+.same-hill-plan h3,
+.same-hill-profile h3 {
+  font-size: 0.85rem;
+  font-weight: 650;
+  margin: 0 0 0.25rem;
+}
+
+.same-hill svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: none;
+  user-select: none;
+}
+
+.same-hill .hill-fill {
+  fill: #e6d5b8;
+}
+
+.same-hill .trough-fill {
+  fill: var(--trough);
+  opacity: 0.45;
+}
+
+.same-hill .contour {
+  fill: none;
+  stroke: #8b6a44;
+  stroke-width: 1;
+  opacity: 0.55;
+}
+
+.same-hill .sun-wedge-highest {
+  fill: var(--highest);
+  opacity: 0.55;
+}
+
+.same-hill .sun-wedge-more {
+  fill: var(--more);
+  opacity: 0.4;
+}
+
+.same-hill .sun-wedge-less {
+  fill: var(--less);
+  opacity: 0.45;
+}
+
+.same-hill .ring-marker {
+  fill: var(--ink);
+}
+
+.same-hill .pin {
+  fill: var(--ink);
+  stroke: #fffdf8;
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.same-hill .pin-hit {
+  fill: transparent;
+  cursor: grab;
+}
+
+.same-hill .ghost {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  opacity: 0.55;
+}
+
+.same-hill .label {
+  fill: var(--muted);
+  font-size: 10px;
+}
+
+.same-hill .label-ink {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.same-hill .pool {
+  fill: var(--pool);
+  opacity: 0.45;
+}
+
+.same-hill .ground {
+  fill: none;
+  stroke: #5c4630;
+  stroke-width: 2;
+}
+
+.same-hill .waterline {
+  stroke: var(--pool);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  fill: none;
+}
+
+.same-hill .axis {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.same-hill-captions {
+  grid-column: 1 / -1;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.same-hill-captions strong {
+  color: var(--ink);
+  font-weight: 650;
+}
+
+.same-hill-legend {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.1rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.same-hill-legend i {
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.55rem;
+  margin-right: 0.3rem;
+  vertical-align: middle;
+}
+
+.same-hill-legend .highest i {
+  background: var(--highest);
+}
+
+.same-hill-legend .more i {
+  background: var(--more);
+}
+
+.same-hill-legend .less i {
+  background: var(--less);
+}
+
+.same-hill-legend .pool i {
+  background: var(--pool);
+}
+
+@media (max-width: 720px) {
+  .same-hill-board {
+    grid-template-columns: 1fr;
+  }
+
+  .same-hill-state {
+    grid-template-columns: 1fr 1fr;
+  }
+}

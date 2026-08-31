@@ -13,4 +13,9 @@ describe("lessonFromHash", () => {
     expect(lessonFromHash("#/occupied-root-zone")).toBe("occupied-root-zone");
     expect(lessonFromHash("#occupied-root-zone")).toBe("occupied-root-zone");
   });
+
+  it("opens same-hill from its hash", () => {
+    expect(lessonFromHash("#/same-hill")).toBe("same-hill");
+    expect(lessonFromHash("#same-hill")).toBe("same-hill");
+  });
 });
