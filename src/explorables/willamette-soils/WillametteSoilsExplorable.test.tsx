@@ -132,6 +132,11 @@ describe("WillametteSoilsExplorable", () => {
     expect(
       screen.getAllByText(/SoilWeb generalized SSURGO/i).length,
     ).toBeGreaterThan(0);
+    expect(screen.getByText(/Basemap: Esri World Topo/i)).toBeInTheDocument();
+    expect(screen.getByText(/NAD27/i)).toBeInTheDocument();
+    expect(screen.queryByText(/CARTO/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Positron/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/OpenStreetMap \(CARTO/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/223414/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Coast Range/i)).not.toBeInTheDocument();
   });

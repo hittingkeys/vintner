@@ -121,7 +121,7 @@ export const LAURELWOOD_DISTRIBUTION =
   "hills along the northwest margin of the Willamette Valley, Oregon; MLRA 2; moderate extent";
 
 export const MAP_ATTRIBUTION_CAPTION =
-  "Basemap: OpenStreetMap (CARTO Positron tiles). Attribution is on the map.";
+  "Basemap: Esri World Topo. Attribution is on the map.";
 
 export const EXTENT_UNCERTAINTY =
   "Colored regions: SoilWeb generalized SSURGO series extent (UC Davis), not a soil survey you can site from, not AVA blobs. Grid size differs by series (Jory 0.005°, Willakenzie and Laurelwood 0.001°). Generalized from SSURGO — not map-unit polygons you can site a vineyard from.";
