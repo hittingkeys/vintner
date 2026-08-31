@@ -30,11 +30,11 @@ const EXTENT_STYLE: Record<
   laurelwood: { fill: "#b4aea6", className: "extent-laurelwood" },
 };
 
-const CARTO_POSITRON =
-  "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+const ESRI_WORLD_TOPO =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}";
 
-const CARTO_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const ESRI_ATTRIBUTION =
+  "Tiles © Esri — Esri, USGS, NOAA, and the GIS User Community";
 
 function seriesForLandform(id: LandformId): SeriesId | null {
   if (id === "surrounding-foothills") return "jory";
@@ -100,10 +100,9 @@ export function ValleyPositionBoard({
       .setView([44.825, -123.0], 8)
       .fitBounds(bounds, { padding: [8, 8], maxZoom: 9 });
 
-    L.tileLayer(CARTO_POSITRON, {
-      attribution: CARTO_ATTRIBUTION,
-      subdomains: "abcd",
-      maxZoom: 19,
+    L.tileLayer(ESRI_WORLD_TOPO, {
+      attribution: ESRI_ATTRIBUTION,
+      maxZoom: 16,
     }).addTo(map);
 
     const layerOrder: SeriesId[] = ["jory", "willakenzie", "laurelwood"];
