@@ -1,0 +1,56 @@
+---
+id: two-hundred-k
+title: "$200k from Portland"
+governingPart: both
+misconception: "$200k buys a vineyard/winery."
+coupledVariables:
+  - remaining cash
+  - land acres
+  - planted acres (cannot exceed owned; year-1 plant is cash only)
+  - grape tons
+  - OLCC winery license when the grapes door is used
+citations:
+  - source: Jacobson, Murray Cordero, Sterns. OSU AEB 0086. An Economic Examination of Pacific Northwest Wine Grape Production (Dec 2025) — 20-acre limited-mechanization Pinot noir, statewide Oregon; year-1 cash $26,587.14/acre; land-value assumption $45,000/acre; year-3 yield 2.0 t/ac; labor 42% of first-five-year cash; cumulative cash through year 5 −$33,660/acre
+    year: 2025
+    url: https://appliedecon.oregonstate.edu/sites/agscid7/files/applied-economics/aeb_0086.pdf
+  - source: 2025 Oregon Grape Pricing Report (OWB / UO IPRE, May 2026) — North Willamette Pinot noir weighted average $2,491/ton; third-party sales only
+    year: 2026
+    url: https://industry.oregonwine.org/wp-content/uploads/2025-Oregon-Grape-Pricing-Report.pdf
+  - source: OLCC liquor license fees Rev 1.01.24 — winery $500/year
+    year: 2024
+  - source: TTB wine permits — no federal fee (page updated 2025-12-09); custom crush requires TTB wholesaler or wine-blender permit plus a written contract with an Oregon winery that holds TTB producer-and-blender; licensee owns the brand (ORS 471.223 / OLCC winery privileges)
+    year: 2025
+prompts:
+  - retrievable: You buy 4 acres at the budget land value. What can you plant in year 1 with the leftover, and why?
+    kind: prediction
+    answerKey: "Nothing. Four acres at the AEB 0086 land-value assumption ($45,000/acre) spend $180,000, leaving $20,000. Year-1 cash to plant is $26,587/acre (AEB 0086 Table 5, $26,587.14), so leftover is below one acre of plant. Planted acres possible = 0."
+    sources:
+      - source: OSU AEB 0086 Dec 2025, Table 5 year-1 total cash $26,587.14/acre; land value assumption $45,000/acre
+        year: 2025
+        url: https://appliedecon.oregonstate.edu/sites/agscid7/files/applied-economics/aeb_0086.pdf
+---
+
+<div className="lesson-prose">
+
+## $200k from Portland
+
+Same weather is the wrong analogy here. Same cash, three doors.
+
+Two hundred thousand dollars of liquid business capital, leaving Portland for the Willamette. It is not one purchase. Land-and-plant, grapes-and-custom-crush, and hired labor send that stack through incompatible doors.
+
+</div>
+
+<TwoHundredK />
+
+<RetrievalPrompt index={0} />
+
+<div className="lesson-prose citations">
+
+## Citations of record
+
+- Jacobson, Murray Cordero, Sterns. OSU AEB 0086 (Dec 2025) — 20-acre limited-mechanization Pinot noir, statewide Oregon (not Willamette-specific); year-1 cash $26,587.14/acre; land-value assumption $45,000/acre (budget opportunity-cost, not a planted-comps survey); year-3 commercial yield 2.0 t/ac; no crop years 1–2; labor 42% of first-five-year cash; cumulative cash through year 5 still −$33,660/acre
+- 2025 Oregon Grape Pricing Report (OWB/UO IPRE, May 2026) — North Willamette Pinot noir weighted average $2,491/ton; median $2,794; third-party sales only
+- OLCC liquor license fees Rev 1.01.24 — winery $500/year. Custom crush is legal: TTB wholesaler or wine-blender permit + written contract with an Oregon winery that holds TTB producer-and-blender; licensee owns the brand (ORS 471.223). TTB: no federal fee (wine permits page, updated 2025-12-09)
+- Custom-crush $/ton is unpublished — the graphic labels that gap rather than inventing a fee
+
+</div>
