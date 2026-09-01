@@ -148,6 +148,32 @@ Bbox (from the vendored files):
 
 GOTCHAS: generalized from SSURGO, not map-unit polygons you can site a vineyard from; gridsize differs by series (Jory 0.005, others 0.001). Caption that. Do not treat AVA names as soil maps.
 
+## $200k from Portland — establishment cash, grape price, license
+
+Same $200k of liquid business capital; three incompatible doors. Do not model Portland rent. Do not invent a custom-crush $/ton. Do not use lender-blog planted Dundee prices. Do not convert tons to cases.
+
+| Claim | Number | Source |
+| --- | --- | --- |
+| Land-value assumption (budget opportunity-cost, not a planted-comps survey); statewide Oregon, not Willamette-specific | $45,000/acre | OSU AEB 0086, Jacobson, Murray Cordero, Sterns (Dec 2025) |
+| Year-1 total cash, 20-acre limited-mechanization Pinot noir | $26,587.14/acre | AEB 0086 Table 5 |
+| Year-3 commercial yield starts; no crop years 1–2 | 2.0 t/ac | AEB 0086 |
+| Cumulative cash through year 5 | −$33,660/acre | AEB 0086 |
+| Labor share of first-five-year cash costs | 42% | AEB 0086 |
+| North Willamette Pinot noir weighted average (third-party sales) | $2,491/ton | 2025 Oregon Grape Pricing Report (OWB/UO IPRE, May 2026) |
+| North Willamette Pinot noir median | $2,794/ton | same report |
+| Statewide Pinot noir average / median | $2,445 / $2,614 per ton | same report |
+| OLCC winery license | $500/year | OLCC liquor license fees Rev 1.01.24 |
+| TTB federal permit fee | none | TTB wine permits page, updated 2025-12-09 |
+| Custom-crush $/ton | unpublished | do not use the 2018 OWB workshop $800/ton |
+
+AEB 0086 PDF: https://appliedecon.oregonstate.edu/sites/agscid7/files/applied-economics/aeb_0086.pdf
+
+Grape pricing PDF: https://industry.oregonwine.org/wp-content/uploads/2025-Oregon-Grape-Pricing-Report.pdf
+
+Custom crush is legal: TTB wholesaler or wine-blender permit + written contract with an Oregon winery that holds TTB producer-and-blender; licensee owns the brand (ORS 471.223 / OLCC winery privileges).
+
+Stack used in the lesson: $200,000. Max land acres at the budget land value = floor(200000/45000) = 4. Max tons that still clears the $500 license = floor((200000−500)/2491) = 80.
+
 ## APIs (weather, climate, soil)
 
 Probe one source at a time: schema, units, missing-data sentinels, one trimmed sample. Do not dump raw payloads into this file or into code comments.

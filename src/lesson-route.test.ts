@@ -18,4 +18,10 @@ describe("lessonFromHash", () => {
     expect(lessonFromHash("#/same-hill")).toBe("same-hill");
     expect(lessonFromHash("#same-hill")).toBe("same-hill");
   });
+
+  it("opens two-hundred-k from its hash and keeps soils as default", () => {
+    expect(lessonFromHash("#/two-hundred-k")).toBe("two-hundred-k");
+    expect(lessonFromHash("#two-hundred-k")).toBe("two-hundred-k");
+    expect(DEFAULT_LESSON).toBe("willamette-soils");
+  });
 });

@@ -2,7 +2,7 @@
 
 Learner-facing viticulture explorable explanations. Client-only React + Vite + TypeScript, MDX lessons, D3 for visualization.
 
-The landing lesson is `content/willamette-soils.mdx`: a Willamette Valley map (SoilWeb series extents + OSD type-location pins) plus three typical pedons (Jory, Willakenzie, Laurelwood) — landform, parent material, and depth to a floor. Spec: `src/explorables/willamette-soils/spec.ts`. Occupied root zone remains at `#/occupied-root-zone`. Same hill (sun vs frost as two geometries) is at `#/same-hill`.
+The landing lesson is `content/willamette-soils.mdx`: a Willamette Valley map (SoilWeb series extents + OSD type-location pins) plus three typical pedons (Jory, Willakenzie, Laurelwood) — landform, parent material, and depth to a floor. Spec: `src/explorables/willamette-soils/spec.ts`. Occupied root zone remains at `#/occupied-root-zone`. Same hill (sun vs frost as two geometries) is at `#/same-hill`. `$200k from Portland` (same cash, three entry doors) is at `#/two-hundred-k`.
 
 Agents: start at [`AGENTS.md`](AGENTS.md). Design standard: [`docs/design-principles.md`](docs/design-principles.md). Domain claims: [`docs/viticulture-facts.md`](docs/viticulture-facts.md). Implementation procedure: [`docs/explorable-design.md`](docs/explorable-design.md). Schemas: [`docs/content-schema.md`](docs/content-schema.md).
 

@@ -5,12 +5,16 @@ import OccupiedLesson, {
 import SameHillLesson, {
   frontmatter as sameHillFrontmatter,
 } from "../content/same-hill.mdx";
+import TwoHundredKLesson, {
+  frontmatter as twoHundredKFrontmatter,
+} from "../content/two-hundred-k.mdx";
 import SoilsLesson, {
   frontmatter as soilsFrontmatter,
 } from "../content/willamette-soils.mdx";
 import { RetrievalPrompt } from "./content/RetrievalPrompt";
 import { OccupiedPawExplorable } from "./explorables/occupied-paw/OccupiedPawExplorable";
 import { SameHillExplorable } from "./explorables/same-hill/SameHillExplorable";
+import { TwoHundredKExplorable } from "./explorables/two-hundred-k/TwoHundredKExplorable";
 import { WillametteSoilsExplorable } from "./explorables/willamette-soils/WillametteSoilsExplorable";
 import { lessonFromHash, type LessonId } from "./lesson-route";
 import type { LessonFrontmatter } from "./schemas/content";
@@ -18,6 +22,7 @@ import type { LessonFrontmatter } from "./schemas/content";
 const soilsLesson = soilsFrontmatter as unknown as LessonFrontmatter;
 const occupiedLesson = occupiedFrontmatter as unknown as LessonFrontmatter;
 const sameHillLesson = sameHillFrontmatter as unknown as LessonFrontmatter;
+const twoHundredKLesson = twoHundredKFrontmatter as unknown as LessonFrontmatter;
 
 function SoilsRetrievalPrompt({ index = 0 }: { index?: number }) {
   const prompt = soilsLesson.prompts?.[index];
@@ -37,6 +42,12 @@ function SameHillRetrievalPrompt({ index = 0 }: { index?: number }) {
   return <RetrievalPrompt prompt={prompt} />;
 }
 
+function TwoHundredKRetrievalPrompt({ index = 0 }: { index?: number }) {
+  const prompt = twoHundredKLesson.prompts?.[index];
+  if (!prompt) return null;
+  return <RetrievalPrompt prompt={prompt} />;
+}
+
 function LessonNav({ lessonId }: { lessonId: LessonId }) {
   return (
     <nav className="lesson-nav" aria-label="Lessons">
@@ -51,6 +62,12 @@ function LessonNav({ lessonId }: { lessonId: LessonId }) {
       </a>
       <a href="#/same-hill" aria-current={lessonId === "same-hill" ? "page" : undefined}>
         Same hill
+      </a>
+      <a
+        href="#/two-hundred-k"
+        aria-current={lessonId === "two-hundred-k" ? "page" : undefined}
+      >
+        $200k from Portland
       </a>
     </nav>
   );
@@ -85,6 +102,13 @@ export default function App() {
           components={{
             SameHill: SameHillExplorable,
             RetrievalPrompt: SameHillRetrievalPrompt,
+          }}
+        />
+      ) : lessonId === "two-hundred-k" ? (
+        <TwoHundredKLesson
+          components={{
+            TwoHundredK: TwoHundredKExplorable,
+            RetrievalPrompt: TwoHundredKRetrievalPrompt,
           }}
         />
       ) : (
