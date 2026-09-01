@@ -28,10 +28,10 @@ describe("TwoHundredKExplorable", () => {
 
   it("exposes land, plant, and tons on the stacks (A4)", () => {
     render(<TwoHundredKExplorable />);
-    expect(screen.getByLabelText(/acres of land to buy/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/acres to plant/i)).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: /acres of land to buy/i })).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: /acres to plant/i })).toBeInTheDocument();
     expect(
-      screen.getByLabelText(/tons of north willamette pinot noir/i),
+      screen.getByRole("slider", { name: /tons of north willamette pinot noir/i }),
     ).toBeInTheDocument();
   });
 
@@ -55,7 +55,7 @@ describe("TwoHundredKExplorable", () => {
 
   it("KA1: 4 acres land leaves $20,000 and closes year-1 plant", () => {
     render(<TwoHundredKExplorable />);
-    fireEvent.change(screen.getByLabelText(/acres of land to buy/i), {
+    fireEvent.change(screen.getByRole("slider", { name: /acres of land to buy/i }), {
       target: { value: "4" },
     });
     expect(screen.getByTestId("land-remaining")).toHaveTextContent("$20,000 remaining");
@@ -69,7 +69,7 @@ describe("TwoHundredKExplorable", () => {
 
   it("refuses a 5th acre and keeps remaining finite", () => {
     render(<TwoHundredKExplorable />);
-    fireEvent.change(screen.getByLabelText(/acres of land to buy/i), {
+    fireEvent.change(screen.getByRole("slider", { name: /acres of land to buy/i }), {
       target: { value: "5" },
     });
     expect(screen.getByTestId("acres-owned")).toHaveTextContent("4 ac owned");
@@ -79,7 +79,9 @@ describe("TwoHundredKExplorable", () => {
 
   it("KA3: 80 tons plus license leaves $220; 81 tons clips to 80", () => {
     render(<TwoHundredKExplorable />);
-    const tons = screen.getByLabelText(/tons of north willamette pinot noir/i);
+    const tons = screen.getByRole("slider", {
+      name: /tons of north willamette pinot noir/i,
+    });
     fireEvent.change(tons, { target: { value: "80" } });
     expect(screen.getByTestId("grapes-remaining")).toHaveTextContent("$220 remaining");
     expect(screen.getByTestId("tons-bought")).toHaveTextContent("80 t bought");

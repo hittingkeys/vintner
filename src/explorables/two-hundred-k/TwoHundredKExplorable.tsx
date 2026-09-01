@@ -293,7 +293,9 @@ function LandDoor({
             role="button"
             tabIndex={0}
             data-pressed={state.landAcres === stop.ac ? "true" : "false"}
-            aria-label={`${stop.ac} acres of land`}
+            aria-label={
+              stop.ac === 1 ? "1 acre of land" : `${stop.ac} acres of land`
+            }
             x={STACK.x - 6}
             y={y(stop.usd) + 3}
             textAnchor="end"
